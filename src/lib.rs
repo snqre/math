@@ -6,7 +6,7 @@ pub mod point {
     use std::fmt::Display;
 
     pub trait PointI<T1: F128I>:
-        Sized
+          Sized
         + PointCoreI<T1>
         + Debug
         + Display 
@@ -30,8 +30,14 @@ pub mod point {
     impl<T1: F128I> PointI<T1> for Point<T1>
         {}
 
-    impl<T1: F128I> Point<T1> 
-        {}
+    impl<T1: F128I> Point<T1> {
+        pub fn new(x: T1, y: T1) -> Self {
+            Self {
+                _x: x,
+                _y: y
+            }
+        }
+    }
 
     impl<T1: F128I> PointCoreI<T1> for Point<T1> {
         fn x(&self) -> T1 {
@@ -83,7 +89,7 @@ pub mod f_128 {
     use std::cmp::Ordering;
 
     pub trait F128I: 
-        Sized
+          Sized
         + F128CoreI
         + Debug
         + Display
@@ -383,6 +389,15 @@ pub mod f_128 {
             let y: F128 = F128::new(50u128, 2u32);
             let result: F128 = (x * y).unwrap();
             let result_ok: F128 = F128::new(100u128, 2u32);
+            assert_eq!(result, result_ok);
+        }
+
+        #[test]
+        fn div() {
+            let x: F128 = F128::new(200u128, 2u32);
+            let y: F128 = F128::new(50u128, 2u32);
+            let result: F128 = (x / y).unwrap();
+            let result_ok: F128 = F128::new(400u128, 2u32);
             assert_eq!(result, result_ok);
         }
     }
