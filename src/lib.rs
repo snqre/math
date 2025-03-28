@@ -7,22 +7,24 @@ pub mod point {
 
     pub trait PointI<T1: F128I>:
         Sized
-        + PointMathI<T1>
+        + PointCoreI<T1>
         + Debug
         + Display 
         + Clone
         + Copy 
         {}
 
-    pub trait PointMathI<T1: F128I>: Sized {
-        fn distance_from(&self, rhs: Self) -> Option<T1>;
+    pub trait PointCoreI<T1: F128I>: Sized {
+        fn x(&self) -> T1;
+        fn y(&self) -> T1;
+        fn distance(&self, rhs: Self) -> Option<T1>;
     }
 
     #[derive(Clone)]
     #[derive(Copy)]
     pub struct Point<T1: F128I> {
-        pub x: T1,
-        pub y: T1,
+        _x: T1,
+        _y: T1,
     }
 
     impl<T1: F128I> PointI<T1> for Point<T1>
@@ -31,17 +33,25 @@ pub mod point {
     impl<T1: F128I> Point<T1> 
         {}
 
-    impl<T1: F128I> PointMathI<T1> for Point<T1> {
-        fn distance_from(&self, rhs: Self) -> Option<T1> {
-            let dfx: T1 = if self.x > rhs.x {
-                (self.x - rhs.x)?
+    impl<T1: F128I> PointCoreI<T1> for Point<T1> {
+        fn x(&self) -> T1 {
+            self._x
+        }
+
+        fn y(&self) -> T1 {
+            self._y
+        }
+
+        fn distance(&self, rhs: Self) -> Option<T1> {
+            let dfx: T1 = if self._x > rhs._x {
+                (self._x - rhs._x)?
             } else {
-                (rhs.x - self.x)?
+                (rhs._x - self._x)?
             };
-            let dfy: T1 = if self.y > rhs.y {
-                (self.y - rhs.y)?
+            let dfy: T1 = if self._y > rhs._y {
+                (self._y - rhs._y)?
             } else {
-                (rhs.y - self.y)?
+                (rhs._y - self._y)?
             };
             let result: T1 = ((dfx * (dfy * dfy)?)?).sqrt()?;
             Some(result)
@@ -50,13 +60,13 @@ pub mod point {
 
     impl<T1: F128I> Debug for Point<T1> {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "Point({},{})", self.x, self.y)
+            write!(f, "Point({},{})", self._x, self._y)
         }
     }
 
     impl<T1: F128I> Display for Point<T1> {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "Point({},{})", self.x, self.y)
+            write!(f, "Point({},{})", self._x, self._y)
         }
     }
 }
@@ -74,8 +84,7 @@ pub mod f_128 {
 
     pub trait F128I: 
         Sized
-        + F128ArithmeticI
-        + F128ConversionI
+        + F128CoreI
         + Debug
         + Display
         + Clone
@@ -92,11 +101,8 @@ pub mod f_128 {
         + Ord 
         {}
 
-    pub trait F128ArithmeticI: Sized {
+    pub trait F128CoreI: Sized {
         fn sqrt(self) -> Option<Self>;
-    }
-
-    pub trait F128ConversionI: Sized {
         fn to_new_decimals(self, new_decimals: u32) -> Option<Self>;
     }
 
@@ -143,7 +149,7 @@ pub mod f_128 {
     impl F128I for F128 
         {}
 
-    impl F128ArithmeticI for F128 {
+    impl F128CoreI for F128 {
         fn sqrt(self) -> Option<Self> {
             if self == F128::new_zero() {
                 let result: F128 = F128::new_zero();
@@ -157,9 +163,7 @@ pub mod f_128 {
             }
             Some(x)
         }
-    }
 
-    impl F128ConversionI for F128 {
         fn to_new_decimals(self, new_decimals: u32) -> Option<Self> {
             Self::to_new_decimals(self, self.1, new_decimals)
             
@@ -356,11 +360,29 @@ pub mod f_128 {
         use crate::f_128::*;
 
         #[test]
-        fn test_add() {
+        fn add() {
             let x: F128 = F128::new(100u128, 2u32);
             let y: F128 = F128::new(200u128, 2u32);
             let result: F128 = (x + y).unwrap();
             let result_ok: F128 = F128::new(300u128, 2u32);
+            assert_eq!(result, result_ok);
+        }
+
+        #[test]
+        fn sub() {
+            let x: F128 = F128::new(200u128, 2u32);
+            let y: F128 = F128::new(100u128, 2u32);
+            let result: F128 = (x - y).unwrap();
+            let result_ok: F128 = F128::new(100u128, 2u32);
+            assert_eq!(result, result_ok);
+        }
+
+        #[test]
+        fn mul() {
+            let x: F128 = F128::new(200u128, 2u32);
+            let y: F128 = F128::new(50u128, 2u32);
+            let result: F128 = (x * y).unwrap();
+            let result_ok: F128 = F128::new(100u128, 2u32);
             assert_eq!(result, result_ok);
         }
     }
