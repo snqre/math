@@ -2,3 +2,7 @@
 name = "math"
 version = "0.0.1"
 edition = "2024"
+
+[dependencies]
+num-traits = "0.2.19"
+thiserror = { version = "*" }
