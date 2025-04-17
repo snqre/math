@@ -11,6 +11,10 @@ use std::ops::Div;
 use thiserror::Error;
 use num_traits::Unsigned;
 
+// A `Q` unit is a fixed point representation. Is less performant in terms of
+// calculations than a floating point but more widely available on many low
+// level systems, and offers reliable, and precise math.
+
 pub static Q_MIN_PRECISION: u8 = 1u8;
 pub static Q_MAX_PRECISION: u8 = 38u8;
 
