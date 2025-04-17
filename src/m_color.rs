@@ -101,7 +101,9 @@ pub mod ext_hsl {
     use crate::m_color::core::_Slot;
     use crate::m_k::core::K;
     use crate::m_k::ext_constructor::k;
+    use crate::m_k::ext_constructor_::k_int;
     use crate::prelude::Branded;
+    use std::ops::Div;
     use num_traits::int::PrimInt;
     use num_traits::Unsigned;
 
@@ -126,26 +128,40 @@ pub mod ext_hsl {
         }
 
         pub(super) fn _to_hsl_from_rgb(r: u8, g: u8, b: u8) -> Result<(u16, K<A, B>, K<A, B>)> {
-            let xv2: B = B::from(2u8).unwrap();
-            let xv2: K<A, B> = k(xv2);
-            let xv0: B = B::from(0u8).unwrap();
-            let xv0: K<A, B> = k(xv0);
-            let r: B = B::from(r).unwrap();
-            let r: K<A, B> = k(r);
-            let g: B = B::from(g).unwrap();
-            let g: K<A, B> = k(g);
-            let b: B = B::from(b).unwrap();
-            let b: K<A, B> = k(b);
-            let max: K<A, B> = r.max(g.max(b));
-            let min: K<A, B> = r.min(g.min(b));
+            let k: _ = |v: u16| -> Result<K<A, B>> {
+                Ok(k_int::<2u8, u16, A, B>(v)?)
+            };
+            let r: K<A, B> = (k_int::<0u8, u8, A, B>(r)? / k(25500u16)?)?;
+            let g: K<A, B> = (k_int::<0u8, u8, A, B>(g)? / k(25500u16)?)?; 
+            let b: K<A, B> = (k_int::<0u8, u8, A, B>(b)? / k(25500u16)?)?;
+            let max: K<A, B> = r.max(g).max(b);
+            let min: K<A, B> = r.min(g).min(b);
             let delta: K<A, B> = (max - min)?;
-            let l: K<A, B> = (max + min)?;
-            let l: K<A, B> = (l / xv2)?;
-            let mut s: K<A, B> = xv0;
-            let mut h: K<A, B> = xv0;
-            if delta != xv0 {
-                let xv0_5: B = B::from()
+            let l: K<A, B> = ((max + min)? / k(200u16)?)?;
+            let mut s: K<A, B> = k(0u16)?;
+            let mut h: K<A, B> = k(0u16)?;
+            if delta != k(0u16)? {
+                s = if l > k(50u16)? {
+                    (delta / ((k(200u16)? - max)? - min)?)?
+                } else {
+                    (delta / (max + min)?)?
+                };
+                if max == r {
+                    h = ((g - b)? / delta)?
+                } else if max == g {
+                    h = (k(200u16)? + ((b - r)? / delta)?)?
+                } else {
+                    h = (k(400u16)? + ((r - g)? / delta)?)?
+                }
+                h = (h * k(6000u16)?)?;
+                if h < k(0u16)? {
+                    h = (h + k(36000u16)?)?;
+                }
             }
+            let h: u16 = h.to_u16()?;
+            let s: K<A, B> = (s * k(10000u16)?)?;
+            let l: K<A, B> = (l * k(10000u16)?)?;
+            Ok((h, s, l))
         }
     }
 }
@@ -153,7 +169,6 @@ pub mod ext_hsl {
 pub mod ext_rgb {
     use crate::m_color::core::*;
     use crate::m_k::core::K;
-    use crate::m_k::ext_constructor::k;
     use crate::m_k::ext_constructor_::k_int;
     use crate::extension::tr_branded::Branded;
     use num_traits::int::PrimInt;
@@ -184,51 +199,35 @@ pub mod ext_rgb {
         }
 
         pub(super) fn _to_rgb_from_hsl(h: &u16, s: &K<A, B>, l: &K<A, B>) -> Result<(u8, u8, u8)> {
-            let k360: K<A, B> = k_int::<2u8, u16, A, B>(36000u16)?;
-            let k100: K<A, B> = k_int::<2u8, u16, A, B>(10000u16)?;
-            let k6: K<A, B> = k_int::<2u8, u16, A, B>(600u16)?;
-            let k5: K<A, B> = k_int::<2u8, u16, A, B>(500u16)?;
-            let k4: K<A, B> = k_int::<2u8, u16, A, B>(400u16)?;
-            let k3: K<A, B> = k_int::<2u8, u16, A, B>(300u16)?;
-            let k2: K<A, B> = k_int::<2u8, u16, A, B>(200u16)?;
-            let k1: K<A, B> = k_int::<2u8, u16, A, B>(100u16)?;
-            let k0: K<A, B> = k_int::<2u8, u16, A, B>(0u16)?;
-            let h: B = B::from(*h).unwrap();
-            
-
-            let h: K<A, B> = k(h);
-            let s: K<A, B> = (*s / k100)?;
-            let l: K<A, B> = (*l / k100)?;
-            let c: K<A, B> = (k2 * l)?;
-            let c: K<A, B> = (c - k1)?;
-            let c: K<A, B> = (c * s)?;
-            let h_prime: K<A, B> = (h & k6)?;
-            let h_prime: K<A, B> = (h_prime / k360)?;
-
-
-            let c: K<A, B> = (((xv2 * l)? - xv1)? * s)?;
-            let h_prime: K<A, B> = ((h * k6)? / k360)?;
-            let x: K<A, B> = (c * ((h_prime % xv2)? - xv1)?)?;
-            let (r, g, b) = if h_prime < xv1 {
-                (c, x, xv0)
-            } else if h_prime < xv2 {
-                (x, c, xv0)
-            } else if h_prime < xv3 {
-                (xv0, c, x)
-            } else if h_prime < xv4 {
-                (xv0, x, c)
-            } else if h_prime < xv5 {
-                (x, xv0, c)
-            } else {
-                (c, xv0, x)
+            let k: _ = |v: u16| -> Result<K<A, B>> {
+                Ok(k_int::<2u8, u16, A, B>(v)?)
             };
-            let m: K<A, B> = ((l - c)? / xv2)?;
-            let r: K<A, B> = (r + m)?;
-            let g: K<A, B> = (g + m)?;
-            let b: K<A, B> = (b + m)?;
-            let r: u8 = r.to_u8()?;
-            let g: u8 = g.to_u8()?;
-            let b: u8 = b.to_u8()?;
+            let h: u16 = *h;
+            let h: K<A, B> = k_int::<0u8, u16, A, B>(h)?;
+            let s: K<A, B> = *s;
+            let s: K<A, B> = (s / k(10000u16)?)?;
+            let l: K<A, B> = *l;
+            let l: K<A, B> = (l / k(10000u16)?)?;
+            let c: K<A, B> = (((k(200u16)? * l)? - k(100u16)?)? * s)?;
+            let h_prime: K<A, B> = ((h * k(600u16)?)? / k(360u16)?)?;
+            let x: K<A, B> = (c * ((h_prime % k(200u16)?)? - k(100u16)?)?)?;
+            let (r, g, b) = if h_prime < k(100u16)? {
+                (c, x, k(0)?)
+            } else if h_prime < k(200u16)? {
+                (x, c, k(0)?)
+            } else if h_prime < k(300u16)? {
+                (k(0)?, c, x)
+            } else if h_prime < k(400u16)? {
+                (k(0)?, x, c)
+            } else if h_prime < k(500u16)? {
+                (x, k(0)?, c)
+            } else {
+                (c, k(0)?, x)
+            };
+            let m: K<A, B> = ((l - c)? / k(200u16)?)?;
+            let r: u8 = (r + m)?.to_u8()?;
+            let g: u8 = (g + m)?.to_u8()?;
+            let b: u8 = (b + m)?.to_u8()?;
             Ok((r, g, b))
         }
     }

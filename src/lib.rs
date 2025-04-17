@@ -1,4 +1,5 @@
 #![deny(warnings)]
+#![allow(clippy::let_with_type_underscore)]
 
 #[allow(unused_imports)]
 pub mod prelude {

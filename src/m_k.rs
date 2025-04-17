@@ -266,60 +266,57 @@ pub mod ext_conversion_float {
 }
 
 pub mod ext_cast {
+    use crate::m_k::core::MAX_PRECISION;
     use crate::m_k::core::K;
     use crate::m_k::core::Error;
     use crate::m_k::core::Result;
     use crate::m_k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
+    use crate::m_k::ext_constructor_::k_int;
     use num_traits::int::PrimInt;
 
-    // todo adjust so it can support 0..38 conversions.
     impl<const A: u8, B: PrimInt + Branded> K<A, B> {
         pub fn cast<const C: u8>(&self) -> Result<K<C, B>> {
-            let old_decimals: u32 = Self::_only_safe_precision(A)?.into();
-            let new_decimals: u32 = Self::_only_safe_precision(C)?.into();
-            let v: B = self._v;
-            if old_decimals == new_decimals {
-                let v: K<C, B> = k(v);
-                return Ok(v)
+            if A == C {
+                return Ok(k(self._v))
             }
-            if self.is_unsigned() {
-                let old_scale: u128 = 10u128.pow(old_decimals);
-                let new_scale: u128 = 10u128.pow(new_decimals);
-                let v: u128 = v
-                    .to_u128()
+            if A > MAX_PRECISION || C > MAX_PRECISION {
+                return Err(Error::PrecisionTooLarge)
+            }
+            let old_decimals: u32 = A.into();
+            let new_decimals: u32 = C.into();
+            if self.is_signed() {
+                let old_scale: i128 = 10i128.pow(old_decimals);
+                let new_scale: i128 = 10i128.pow(new_decimals);
+                let result: i128 = self._v
+                    .to_i128()
                     .unwrap()
                     .checked_mul(new_scale)
                     .ok_or(Error::Overflow)?
                     .checked_div(old_scale)
                     .ok_or(Error::DivisionByZero)?;
-                if v > B::max_value().to_u128().unwrap() {
-                    let e: Error = Error::Overflow;
-                    return Err(e)
+                if result > B::max_value().to_i128().unwrap() {
+                    return Err(Error::Overflow)
                 }
-                let v: B = B::from(v).unwrap();
-                return Ok(k(v))
+                if result < B::min_value().to_i128().unwrap() {
+                    return Err(Error::Underflow)
+                }
+                return Ok(k_int::<C, i128, C, B>(result)?)
             }
             debug_assert!(self.is_signed());
-            let old_scale: i128 = 10i128.pow(old_decimals);
-            let new_scale: i128 = 10i128.pow(new_decimals);
-            let v: i128 = v
-                .to_i128()
+            let old_scale: u128 = 10u128.pow(old_decimals);
+            let new_scale: u128 = 10u128.pow(new_decimals);
+            let result: u128 = self._v
+                .to_u128()
                 .unwrap()
                 .checked_mul(new_scale)
                 .ok_or(Error::Overflow)?
                 .checked_div(old_scale)
                 .ok_or(Error::DivisionByZero)?;
-            if v > B::max_value().to_i128().unwrap() {
-                let e: Error = Error::Overflow;
-                return Err(e)
+            if result > B::max_value().to_u128().unwrap() {
+                return Err(Error::Overflow)
             }
-            if v < B::min_value().to_i128().unwrap() {
-                let e: Error = Error::Underflow;
-                return Err(e)
-            }
-            let v: B = B::from(v).unwrap();
-            Ok(k(v))
+            Ok(k_int::<C, u128, C, B>(result)?)
         }
     }
 }
