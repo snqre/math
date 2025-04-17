@@ -1,21 +1,21 @@
 #[allow(unused_imports)]
 pub mod prelude {
-    pub use crate::m_k::core::*;
-    pub use crate::m_k::ext_add::*;
-    pub use crate::m_k::ext_constructor::*;
-    pub use crate::m_k::ext_div::*;
-    pub use crate::m_k::ext_eq::*;
-    pub use crate::m_k::ext_mul::*;
-    pub use crate::m_k::ext_ord::*;
-    pub use crate::m_k::ext_partial_eq::*;
-    pub use crate::m_k::ext_partial_ord::*;
-    pub use crate::m_k::ext_precision_validator::*;
-    pub use crate::m_k::ext_sign_introspection::*;
-    pub use crate::m_k::ext_size_introspection::*;
-    pub use crate::m_k::ext_sub::*;
+    pub use crate::k::main::*;
+    pub use crate::k::ext_add::*;
+    pub use crate::k::ext_constructor::*;
+    pub use crate::k::ext_div::*;
+    pub use crate::k::ext_eq::*;
+    pub use crate::k::ext_mul::*;
+    pub use crate::k::ext_ord::*;
+    pub use crate::k::ext_partial_eq::*;
+    pub use crate::k::ext_partial_ord::*;
+    pub use crate::k::ext_precision_validator::*;
+    pub use crate::k::ext_sign_introspection::*;
+    pub use crate::k::ext_size_introspection::*;
+    pub use crate::k::ext_sub::*;
 }
 
-pub mod core {
+pub mod main {
     use thiserror::Error;
     use num_traits::int::PrimInt;
 
@@ -58,8 +58,7 @@ pub mod core {
 }
 
 pub mod ext_constructor {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_cast;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
     
     pub fn k<const A: u8, B: PrimInt>(v: B) -> K::<A, B> {
@@ -76,10 +75,10 @@ pub mod ext_constructor {
 }
 
 pub mod ext_constructor_ {
-    use crate::m_k::core::K;
-    use crate::m_k::core::Error;
-    use crate::m_k::core::Result;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::K;
+    use crate::k::main::Error;
+    use crate::k::main::Result;
+    use crate::k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
     use num_traits::int::PrimInt;
 
@@ -99,7 +98,7 @@ pub mod ext_constructor_ {
 }
 
 pub mod ext_precision_validator {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
 
     impl<const A: u8, B: PrimInt> K<A, B> {
@@ -116,7 +115,7 @@ pub mod ext_precision_validator {
 }
 
 pub mod ext_size_introspection {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use crate::extension::tr_branded::Branded;
     use num_traits::int::PrimInt;
 
@@ -132,8 +131,8 @@ pub mod ext_size_introspection {
 }
 
 pub mod ext_sign_introspection {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_sign_validator::_Sign;
+    use crate::k::main::*;
+    use crate::k::ext_sign_validator::_Sign;
     use crate::extension::tr_branded::Branded;
     use num_traits::int::PrimInt;
 
@@ -154,7 +153,7 @@ pub mod ext_sign_introspection {
 }
 
 pub mod ext_sign_validator {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use crate::extension::tr_branded::Branded;
     use num_traits::int::PrimInt;
 
@@ -179,7 +178,7 @@ pub mod ext_sign_validator {
 }
 
 pub mod ext_conversion_unsigned {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
 
     impl<const A: u8, B: PrimInt> K<A, B> {
@@ -210,7 +209,7 @@ pub mod ext_conversion_unsigned {
 }
 
 pub mod ext_conversion_signed {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
 
     impl<const A: u8, B: PrimInt> K<A, B> {
@@ -241,7 +240,7 @@ pub mod ext_conversion_signed {
 }
 
 pub mod ext_conversion_float {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::{int::PrimInt, ToPrimitive};
 
     impl<const A: u8, B: PrimInt> K<A, B> {
@@ -266,13 +265,13 @@ pub mod ext_conversion_float {
 }
 
 pub mod ext_cast {
-    use crate::m_k::core::MAX_PRECISION;
-    use crate::m_k::core::K;
-    use crate::m_k::core::Error;
-    use crate::m_k::core::Result;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::MAX_PRECISION;
+    use crate::k::main::K;
+    use crate::k::main::Error;
+    use crate::k::main::Result;
+    use crate::k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
-    use crate::m_k::ext_constructor_::k_int;
+    use crate::k::ext_constructor_::k_int;
     use num_traits::int::PrimInt;
 
     impl<const A: u8, B: PrimInt + Branded> K<A, B> {
@@ -301,7 +300,7 @@ pub mod ext_cast {
                 if result < B::min_value().to_i128().unwrap() {
                     return Err(Error::Underflow)
                 }
-                return Ok(k_int::<C, i128, C, B>(result)?)
+                return k_int::<C, i128, C, B>(result)
             }
             debug_assert!(self.is_signed());
             let old_scale: u128 = 10u128.pow(old_decimals);
@@ -316,14 +315,14 @@ pub mod ext_cast {
             if result > B::max_value().to_u128().unwrap() {
                 return Err(Error::Overflow)
             }
-            Ok(k_int::<C, u128, C, B>(result)?)
+            k_int::<C, u128, C, B>(result)
         }
     }
 }
 
 pub mod ext_rem {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
     use std::ops::Rem;
     use num_traits::int::PrimInt;
@@ -364,8 +363,8 @@ pub mod ext_rem {
 }
 
 pub mod ext_add {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use std::ops::Add;
     use num_traits::int::PrimInt;
     
@@ -384,8 +383,8 @@ pub mod ext_add {
 }
 
 pub mod ext_sub {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use std::ops::Sub;
     use num_traits::int::PrimInt;
     
@@ -404,8 +403,8 @@ pub mod ext_sub {
 }
 
 pub mod ext_mul {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
     use std::ops::Mul;
     use num_traits::int::PrimInt;
@@ -468,8 +467,8 @@ pub mod ext_mul {
 }
 
 pub mod ext_div {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use crate::extension::tr_branded::Branded;
     use std::ops::Div;
     use num_traits::int::PrimInt;
@@ -574,7 +573,7 @@ pub mod ext_div {
 }
 
 pub mod ext_partial_ord {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use std::cmp::Ordering;
     use num_traits::int::PrimInt;
     
@@ -602,8 +601,8 @@ pub mod ext_partial_ord {
 }
 
 pub mod ext_ord {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
     use std::cmp::Ordering;
     use num_traits::int::PrimInt;
     
@@ -649,7 +648,7 @@ pub mod ext_ord {
 }
 
 pub mod ext_partial_eq {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
     
     impl<const A: u8, B: PrimInt> PartialEq for K<A, B> {
@@ -660,7 +659,7 @@ pub mod ext_partial_eq {
 }
 
 pub mod ext_eq {
-    use crate::m_k::core::*;
+    use crate::k::main::*;
     use num_traits::int::PrimInt;
     
     impl<const A: u8, B: PrimInt> Eq for K<A, B> {}
@@ -668,8 +667,8 @@ pub mod ext_eq {
 
 #[cfg(test)]
 mod test {
-    use crate::m_k::core::*;
-    use crate::m_k::ext_constructor::k;
+    use crate::k::main::*;
+    use crate::k::ext_constructor::k;
 
     #[test]
     fn test_u_rem() {

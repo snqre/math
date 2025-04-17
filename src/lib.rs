@@ -3,11 +3,11 @@
 
 #[allow(unused_imports)]
 pub mod prelude {
-    pub use crate::m_k::prelude::*;
+    pub use crate::k::prelude::*;
 
-    pub use crate::m_k::core::*;
-    pub use crate::m_k::ext_add;
-    pub use crate::m_k::ext_constructor;
+    pub use crate::k::main::*;
+    pub use crate::k::ext_add;
+    pub use crate::k::ext_constructor;
     pub use crate::extension::ext_i8;
     pub use crate::extension::ext_i16;
     pub use crate::extension::ext_i32;
@@ -22,6 +22,6 @@ pub mod prelude {
 }
 
 mod extension;
-mod m_coordinate;
-mod m_color;
-mod m_k;
+mod color;
+mod coordinate;
+mod k;
