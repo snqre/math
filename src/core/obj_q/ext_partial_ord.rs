@@ -1,6 +1,4 @@
-use super::*;
-use std::cmp::Ordering;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt> PartialOrd for Q<A, B> {
     fn gt(&self, other: &Self) -> bool {

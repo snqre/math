@@ -1,6 +1,7 @@
+boiler::extend!();
+
 use crate::core::tr_brandable::*;
 use crate::core::tr_sign_introspection::SignIntrospection;
-use super::*;
 use num_traits::int::PrimInt;
 
 pub fn k_int<const A: u8, B: PrimInt, const C: u8, D: PrimInt + Brandable + SignIntrospection>(v: B) -> QR<Q::<C, D>> {

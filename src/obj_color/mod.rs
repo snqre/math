@@ -1,4 +1,9 @@
 boiler::bundle!("src/obj_color");
+
+mod main {
+    
+}
+
 boiler::public!(
     main,
     ext_eq,
@@ -9,7 +14,3 @@ boiler::public!(
     ext_rgb,
     ext_rgba,
 );
-
-mod main {
-    
-}

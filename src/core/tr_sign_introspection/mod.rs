@@ -1,4 +1,11 @@
 boiler::bundle!("src/core/tr_sign_introspection");
+
+mod main {
+    pub trait SignIntrospection {
+        fn is_signed(&self) -> bool;
+    }
+}
+
 boiler::public!(
     main,
     for_i8,
@@ -14,9 +21,3 @@ boiler::public!(
     for_u128,
     for_usize,
 );
-
-mod main {
-    pub trait SignIntrospection {
-        fn is_signed(&self) -> bool;
-    }
-}

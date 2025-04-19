@@ -1,8 +1,4 @@
-use crate::core::tr_brandable::*;
-use crate::core::tr_sign_introspection::*;
-use super::*;
-use std::ops::Mul;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Mul for Q<A, B> {
     type Output = QR<Self>;
@@ -30,10 +26,10 @@ impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Mul for Q<A, B> {
                 .ok_or(QE::Overflow)?
                 .checked_div(scale)
                 .ok_or(QE::DivisionByZero)?;
-            if v_2 > x.upper_bound().to_i128().unwrap() {
+            if v_2 > x.max_value().to_i128().unwrap() {
                 return Err(QE::Overflow)
             }
-            if v_2 < x.lower_bound().to_i128().unwrap() {
+            if v_2 < x.min_value().to_i128().unwrap() {
                 return Err(QE::Underflow)
             }
             let v_2: B = B::from(v_2).unwrap();
@@ -50,7 +46,7 @@ impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Mul for Q<A, B> {
             .ok_or(QE::Overflow)?
             .checked_div(scale)
             .ok_or(QE::DivisionByZero)?;
-        if v_2 > x.upper_bound().to_u128().unwrap() {
+        if v_2 > x.max_value().to_u128().unwrap() {
             return Err(QE::Overflow)
         }
         let v_2: B = B::from(v_2).unwrap();

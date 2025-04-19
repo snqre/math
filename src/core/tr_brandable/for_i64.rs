@@ -1,4 +1,4 @@
-use super::*;
+boiler::extend!();
 
 impl Brandable for i64 {
     fn brand(&self) -> Brand {

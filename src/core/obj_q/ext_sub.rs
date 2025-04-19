@@ -1,6 +1,4 @@
-use super::*;
-use std::ops::Sub;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt> Sub for Q<A, B> {
     type Output = QR<Self>;

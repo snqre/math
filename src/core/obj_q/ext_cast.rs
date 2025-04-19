@@ -1,7 +1,4 @@
-use crate::core::tr_brandable::*;
-use crate::core::tr_sign_introspection::SignIntrospection;
-use super::*;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Q<A, B> {
     pub fn cast<const C: u8>(&self) -> QR<Q<C, B>> {

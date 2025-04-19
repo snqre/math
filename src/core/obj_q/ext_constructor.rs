@@ -1,4 +1,4 @@
-use super::*;
+boiler::extend!();
 use num_traits::int::PrimInt;
 
 pub fn q<const A: u8, B: PrimInt>(v: B) -> Q::<A, B> {

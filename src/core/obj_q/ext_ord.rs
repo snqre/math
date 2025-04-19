@@ -1,6 +1,4 @@
-use super::*;
-use std::cmp::Ordering;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt> Ord for Q<A, B> {
     fn clamp(self, min: Self, max: Self) -> Self {

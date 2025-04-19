@@ -1,4 +1,4 @@
-use super::*;
+boiler::extend!();
 
 impl SignIntrospection for isize {
     fn is_signed(&self) -> bool {

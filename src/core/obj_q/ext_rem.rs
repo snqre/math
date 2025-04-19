@@ -1,8 +1,4 @@
-use crate::core::tr_brandable::*;
-use crate::core::tr_sign_introspection::*;
-use super::*;
-use std::ops::Rem;
-use num_traits::int::PrimInt;
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Rem for Q<A, B> {
     type Output = QR<Self>;

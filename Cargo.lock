@@ -21,8 +21,8 @@ dependencies = [
 
 [[package]]
 name = "boiler"
-version = "0.2.0"
-source = "git+https://github.com/snqre/boiler.git#1f0aef1bd936276dba251ae81af116b27b920533"
+version = "0.3.1"
+source = "git+https://github.com/snqre/boiler.git#3eb7569983088281b13216caa77cbb9bf98d9d22"
 dependencies = [
  "automod",
 ]
@@ -34,8 +34,6 @@ dependencies = [
  "automod",
  "boiler",
  "num-traits",
- "quote",
- "syn",
  "thiserror",
 ]
 

@@ -1,10 +1,4 @@
-use num_traits::PrimInt;
-
-use crate::core::{tr_brandable::Brandable, tr_sign_introspection::SignIntrospection};
-
-use super::{QE, QR};
-
-
+boiler::extend!();
 
 impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Q<A, B> {
     pub fn sqrt(&self) -> QR<Self> {
