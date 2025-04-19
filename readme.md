@@ -25,3 +25,12 @@ We use **module name prefixes** to quickly identify the purpose of a module at a
 Whenever practical, modules are grouped into folders based on their roles. This provides a clean and discoverable layout without sacrificing granularity.
 
 model directory vs model file
+
+
+[] - class / struct / enum
+c_ - collection
+tr_ - trait - impl for primite types or non native types
+may contain
+    for_
+    for diretly implementing the type for any other types in the module
+    especially if it is a local trait for something particular

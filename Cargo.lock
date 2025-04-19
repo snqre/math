@@ -9,10 +9,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
+name = "automod"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebb4bd301db2e2ca1f5be131c24eb8ebf2d9559bc3744419e93baf8ddea7e670"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "boiler"
+version = "0.2.0"
+source = "git+https://github.com/snqre/boiler.git#1f0aef1bd936276dba251ae81af116b27b920533"
+dependencies = [
+ "automod",
+]
+
+[[package]]
 name = "math"
 version = "0.1.0"
 dependencies = [
+ "automod",
+ "boiler",
  "num-traits",
+ "quote",
+ "syn",
  "thiserror",
 ]
 
@@ -27,9 +50,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a31971752e70b8b2686d7e46ec17fb38dad4051d94024c88df49b667caea9c84"
+checksum = "02b3e5e68a3a1a02aad3ec490a98007cbc13c37cbe84a3cd7b8e406d76e7f778"
 dependencies = [
  "unicode-ident",
 ]
