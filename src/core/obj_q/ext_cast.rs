@@ -1,7 +1,7 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Q<A, B> {
-    pub fn cast<const C: u8>(&self) -> QR<Q<C, B>> {
+impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> q<A, B> {
+    pub fn cast<const C: u8>(&self) -> QR<q<C, B>> {
         if A == C {
             return Ok(q(self._v))
         }

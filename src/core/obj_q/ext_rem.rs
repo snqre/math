@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Rem for Q<A, B> {
+impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Rem for q<A, B> {
     type Output = QR<Self>;
 
     fn rem(self, rhs: Self) -> Self::Output {

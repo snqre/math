@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Div for Q<A, B> {
+impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Div for q<A, B> where CheckPrecision<A>: _IsPrecision {
     type Output = QR<Self>;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -13,7 +13,7 @@ impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Div for Q<A, B> {
         let v_1: &B = &y._v;
         if A < Q_MIN_PRECISION {
             let v_2: B = v_0.checked_div(v_1).ok_or(QE::DivisionByZero)?;
-            let v_2: Q<A, B> = q(v_2);
+            let v_2: q<A, B> = q(v_2);
             return Ok(v_2)
         }
         let decimals: u32 = A.into();
@@ -43,7 +43,7 @@ impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Div for Q<A, B> {
                 return Err(QE::Underflow)
             }
             let v_2: B = B::from(v_2).unwrap();
-            let v_2: Q<A, B> = q(v_2);
+            let v_2: q<A, B> = q(v_2);
             return Ok(v_2)
         }
         debug_assert!(!x.is_signed());
@@ -68,7 +68,7 @@ impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Div for Q<A, B> {
             return Err(QE::Overflow)
         }
         let v_2: B = B::from(v_2).unwrap();
-        let v_2: Q<A, B> = q(v_2);
+        let v_2: q<A, B> = q(v_2);
         Ok(v_2)
     }
 }

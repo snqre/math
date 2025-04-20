@@ -1,5 +1,6 @@
 boiler::bundle!("src/core/obj_q");
 
+use crate::core::tr_brandable::Brand;
 use crate::core::tr_brandable::Brandable;
 use crate::core::tr_sign_introspection::SignIntrospection;
 use core::ops::Add;
@@ -10,6 +11,28 @@ use core::ops::Rem;
 use core::cmp::Ordering;
 use num_traits::int::PrimInt;
 use thiserror::Error;
+use unsafe_util::*;
+
+/// Utilities for extending the module.
+/// Are unsafe because they do not protect against invariant state.
+/// There are not invariant safety guarantees while creating types
+/// for these. And the invariance must be checked on the consuming
+/// side.
+pub mod unsafe_util {
+    boiler::extend!();    
+
+    // private to discourage creating invariant types.
+    #[derive(Debug)]
+    #[derive(Clone)]
+    #[derive(Copy)]
+    pub(super) struct Q<const A: u8, B: PrimInt> where _CheckPrecision<A>: _IsPrecision {
+        pub(super) _v: B,
+    }
+
+    boiler::package!(
+        unsafe_variant_builder
+    );
+}
 
 mod main {
     boiler::extend!();
@@ -41,14 +64,29 @@ mod main {
         #[error("")]
         ConversionFailure,
     }
-
-    #[derive(Debug)]
-    #[derive(Clone)]
-    #[derive(Copy)]
-    pub struct Q<const A: u8, B: PrimInt> {
-        pub(super) _v: B,
-    }
 }
+
+
+
+
+
+trait _IsPrecision {}
+
+macro_rules! _for_precision {
+    ($($n:literal),*) => {
+        $(impl _IsPrecision for _CheckPrecision<$n> {})*
+    };
+}
+
+#[repr(transparent)]
+struct _CheckPrecision<const A: u8>;
+
+_for_precision!(
+    1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33, 34, 35, 36, 37, 38
+);
 
 boiler::public!(
     main,

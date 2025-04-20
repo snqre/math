@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt + SignIntrospection> Q<A, B> {
+impl<const A: u8, B: PrimInt + SignIntrospection> q<A, B> where CheckPrecision<A>: _IsPrecision {
     pub fn max_value(&self) -> B {
         B::max_value()
     }

@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt> Add for Q<A, B> {
+impl<const A: u8, B: PrimInt + Brandable> Add for Q<A, B> where _CheckPrecision<A>: _IsPrecision {
     type Output = QR<Self>;
 
     fn add(self, rhs: Self) -> Self::Output {

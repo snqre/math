@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> Q<A, B> {
+impl<const A: u8, B: PrimInt + Brandable + SignIntrospection> q<A, B> {
     pub fn sqrt(&self) -> QR<Self> {
         let v: B = self._v;
         if v < B::zero() {

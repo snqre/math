@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt> Sub for Q<A, B> {
+impl<const A: u8, B: PrimInt> Sub for q<A, B> {
     type Output = QR<Self>;
 
     fn sub(self, rhs: Self) -> Self::Output {

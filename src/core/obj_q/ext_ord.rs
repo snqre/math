@@ -1,6 +1,6 @@
 boiler::extend!();
 
-impl<const A: u8, B: PrimInt> Ord for Q<A, B> {
+impl<const A: u8, B: PrimInt> Ord for q<A, B> {
     fn clamp(self, min: Self, max: Self) -> Self {
         if self > max {
             return max
