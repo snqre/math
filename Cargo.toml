@@ -11,3 +11,6 @@ version = "*"
 version = "=0.2.19"
 [dependencies.thiserror]
 version = "=2.0.12"
+
+[profile.dev]
+overflow-checks = true

@@ -1,1 +1,0 @@
-2 decimals places is enough for css
