@@ -6,8 +6,6 @@ boiler::extend!();
 #[derive(Error)]
 pub enum Error {
     #[error("")]
-    InsufficientRangeToSupportPrecision,
-    #[error("")]
     Overflow,
     #[error("")]
     Underflow,

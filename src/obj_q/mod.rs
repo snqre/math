@@ -11,6 +11,58 @@ use core::cmp::Ordering;
 use num_traits::int::PrimInt;
 use thiserror::Error;
 
+pub mod variant {
+    boiler::extend!();
+    boiler::expose!(
+        t_q1u8,
+        t_q2u8,
+    );
+}
+
+pub mod generic {
+    boiler::extend!();
+    boiler::expose!(
+        t_q1,
+        t_q2,
+        t_q3,
+        t_q4,
+        t_q5,
+        t_q6,
+        t_q7,
+        t_q8,
+        t_q9,
+        t_q10,
+        t_q11,
+        t_q12,
+        t_q13,
+        t_q14,
+        t_q15,
+        t_q16,
+        t_q17,
+        t_q18,
+        t_q19,
+        t_q20,
+        t_q21,
+        t_q22,
+        t_q23,
+        t_q24,
+        t_q25,
+        t_q26,
+        t_q27,
+        t_q28,
+        t_q29,
+        t_q30,
+        t_q31,
+        t_q32,
+        t_q33,
+        t_q34,
+        t_q35,
+        t_q36,
+        t_q37,
+        t_q38,
+    );
+}
+
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
@@ -20,9 +72,6 @@ pub struct Q<const A: u8, B: PrimInt> where CheckPrecision<A>: IsPrecision {
 
 boiler::expose!(
     error,
-    result,
-    precision_range,
-    precision_validation,
     ext_add,
     ext_branded,
     ext_cap_introspection,
@@ -71,19 +120,18 @@ boiler::expose!(
     ext_try_from_u64,
     ext_try_from_u128,
     ext_try_from_usize,
-
+    precision_range,
+    precision_validation,
+    result,
     t_q1,
-    t_q1u8,
     t_q2,
-    t_q2u8,
     t_q3,
     t_q4,
     t_q5,
     t_q6,
     t_q7,
     t_q8,
-    t_q8,
-    t_q8,
+    t_q9,
     t_q10,
     t_q11,
     t_q12,
@@ -103,4 +151,14 @@ boiler::expose!(
     t_q26,
     t_q27,
     t_q28,
+    t_q29,
+    t_q30,
+    t_q31,
+    t_q32,
+    t_q33,
+    t_q34,
+    t_q35,
+    t_q36,
+    t_q37,
+    t_q38,
 );
