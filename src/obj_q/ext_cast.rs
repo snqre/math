@@ -3,7 +3,7 @@ boiler::extend!();
 impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Q<A, B> where CheckPrecision<A>: IsPrecision {
     pub fn cast<const C: u8>(&self) -> Result<Q<C, B>> where CheckPrecision<C>: IsPrecision {
         if A == C {
-            return Ok(q(self._v))
+            return Ok(q(self.v))
         }
         if A > Q_MAX_PRECISION || C > Q_MAX_PRECISION {
             return Err(Error::PrecisionTooLarge)
@@ -13,7 +13,7 @@ impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Q<A, B> where CheckP
         if self.is_signed() {
             let old_scale: i128 = 10i128.pow(old_decimals);
             let new_scale: i128 = 10i128.pow(new_decimals);
-            let result: i128 = self._v
+            let result: i128 = self.v
                 .to_i128()
                 .unwrap()
                 .checked_mul(new_scale)
@@ -31,7 +31,7 @@ impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Q<A, B> where CheckP
         debug_assert!(self.is_signed());
         let old_scale: u128 = 10u128.pow(old_decimals);
         let new_scale: u128 = 10u128.pow(new_decimals);
-        let result: u128 = self._v
+        let result: u128 = self.v
             .to_u128()
             .unwrap()
             .checked_mul(new_scale)

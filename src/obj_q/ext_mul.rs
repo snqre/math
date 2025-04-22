@@ -9,8 +9,8 @@ impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Mul for Q<A, B> wher
         }
         let x: &Self = &self;
         let y: &Self = &rhs;
-        let v_0: &B = &x._v;
-        let v_1: &B = &y._v;
+        let v_0: &B = &x.v;
+        let v_1: &B = &y.v;
         if A < Q_MIN_PRECISION {
             let v_2: B = v_0.checked_mul(v_1).ok_or(Error::Overflow)?;
             let v_2: Q<A, B> = q(v_2);

@@ -7,8 +7,8 @@ impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Rem for Q<A, B> wher
         let x: &Self = &self;
         let y: &Self = &rhs;
         if x.is_signed() && y.is_signed() {
-            let v_0: i128 = x._v.to_i128().unwrap();
-            let v_1: i128 = y._v.to_i128().unwrap();
+            let v_0: i128 = x.v.to_i128().unwrap();
+            let v_1: i128 = y.v.to_i128().unwrap();
             if v_1 == 0 {
                 return Err(Error::DivisionByZero)
             }
@@ -18,8 +18,8 @@ impl<const A: u8, B: PrimInt + Branded + SignIntrospection> Rem for Q<A, B> wher
         }
         debug_assert!(!x.is_signed());
         debug_assert!(!y.is_signed());
-        let v_0: u128 = x._v.to_u128().unwrap();
-        let v_1: u128 = y._v.to_u128().unwrap();
+        let v_0: u128 = x.v.to_u128().unwrap();
+        let v_1: u128 = y.v.to_u128().unwrap();
         if v_1 == 0 {
             return Err(Error::DivisionByZero)
         }

@@ -1,4 +1,4 @@
 #![no_std]
 
 mod common;
-mod obj_q;
+pub mod obj_q;

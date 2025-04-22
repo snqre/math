@@ -15,7 +15,11 @@ pub mod variant {
     boiler::extend!();
     boiler::expose!(
         t_q1u8,
+        t_q1u16,
         t_q2u8,
+        t_q2u16,
+        t_q3u16,
+        t_q4u16,
     );
 }
 
@@ -66,8 +70,8 @@ pub mod generic {
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
-pub struct Q<const A: u8, B: PrimInt> where CheckPrecision<A>: IsPrecision {
-    pub(super) _v: B,
+struct Q<const A: u8, B: PrimInt> where CheckPrecision<A>: IsPrecision {
+    pub(super) v: B,
 }
 
 boiler::expose!(

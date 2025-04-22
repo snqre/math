@@ -14,8 +14,8 @@ impl<const A: u8, B: PrimInt + Branded> Ord for Q<A, B> where CheckPrecision<A>:
     fn max(self, other: Self) -> Self {
         let x: &Self = &self;
         let y: &Self = &other;
-        let v_0: B = x._v;
-        let v_1: B = y._v;
+        let v_0: B = x.v;
+        let v_1: B = y.v;
         let v_2: B = v_0.max(v_1);
         if v_2 == v_0 {
             return q(v_0)
@@ -26,8 +26,8 @@ impl<const A: u8, B: PrimInt + Branded> Ord for Q<A, B> where CheckPrecision<A>:
     fn min(self, other: Self) -> Self {
         let x: &Self = &self;
         let y: &Self = &other;
-        let v_0: B = x._v;
-        let v_1: B = y._v;
+        let v_0: B = x.v;
+        let v_1: B = y.v;
         let v_2: B = v_0.min(v_1);
         if v_2 == v_0 {
             return q(v_0)
@@ -36,6 +36,6 @@ impl<const A: u8, B: PrimInt + Branded> Ord for Q<A, B> where CheckPrecision<A>:
     }
 
     fn cmp(&self, other: &Self) -> Ordering {
-        self._v.cmp(&other._v)
+        self.v.cmp(&other.v)
     }
 }
