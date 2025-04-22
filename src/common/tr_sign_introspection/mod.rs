@@ -1,13 +1,10 @@
 boiler::bundle!("src/common/tr_sign_introspection");
 
-mod main {
-    pub trait SignIntrospection {
-        fn is_signed(&self) -> bool;
-    }
+pub trait SignIntrospection {
+    fn is_signed(&self) -> bool;
 }
 
 boiler::expose!(
-    main,
     for_i8,
     for_i16,
     for_i32,

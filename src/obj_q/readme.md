@@ -1,3 +1,5 @@
+This document outlines thee structure and capabilities of the `Q` fixed point representation systeem built upon standard integer types, precision scaling (Q-format), and symbolic notation for large units.
+
 | Symbol |                                           |          |
 |--------|-------------------------------------------|----------|
 | K      | 1,000                                     | THOUSAND |
@@ -25,7 +27,7 @@
 | i128 | 1.70E+38 (~170,141,183.4QUETTA) | -1.70E+38 (~-170,141,183.4QUETTA) | 16   |
 
 
-Any missing types to 38 are non representable. Nominal values are rounded down, so the actual cap may be slightly higher than does shown.
+Any missing types to precision 38 are non representable or not whole numbers (too small) to be of relevant significance. Nominal values are rounded down, so the actual cap may be slightly higher than does shown.
 
 ###### U8
 | Type  | Precision | Max Nominal    | Min Nominal |
@@ -36,7 +38,7 @@ Any missing types to 38 are non representable. Nominal values are rounded down, 
 ###### U16
 | Type   | Precision | Max Nominal       | Min Nominal |
 |--------|-----------|-------------------|-------------|
-| Q1U16  | 1         | 6.55E+03 (K ~6.5) | 0           |
+| Q1U16  | 1         | 6.55E+03 (K ~6)   | 0           |
 | Q2U16  | 2         | 6.55E+02 (~655)   | 0           |
 | Q3U16  | 3         | 6.55E+01 (~65)    | 0           |
 | Q4U16  | 4         | 6.55E+00 (~6)     | 0           |
@@ -137,4 +139,18 @@ u128
 | Q35U128 | 35        |
 | Q36U128 | 36        |
 | Q37U128 | 37        |
-| Q38U128 | 38        |
+| Q38U128 | 38        | 
+
+
+
+
+
+###### I128
+| Q1I128 | 1 | 1.70E+38 | -1.70E+38 |
+| Q2I128 | 2 | 1.70E+
+
+### Remarks
+***Overflow Consideration***
+Fixed point systms require careful value bound checking espcially on high precision. Each `Q` type returns a `Result` on overflow or underflow.
+
+An increase in the maximum representable value proportionally decrases the possible precision.

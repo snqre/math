@@ -1,33 +1,30 @@
 boiler::bundle!("src/common/tr_branded");
 
-mod main {
-    use num_traits::int::PrimInt;
+use num_traits::int::PrimInt;
 
-    #[derive(Debug)]
-    #[derive(Clone)]
-    #[derive(PartialEq)]
-    pub enum Brand {
-        I8,
-        I16,
-        I32,
-        I64,
-        I128,
-        ISize,
-        U8,
-        U16,
-        U32,
-        U64,
-        U128,
-        USize,
-    }
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(PartialEq)]
+pub enum Brand {
+    I8,
+    I16,
+    I32,
+    I64,
+    I128,
+    ISize,
+    U8,
+    U16,
+    U32,
+    U64,
+    U128,
+    USize,
+}
 
-    pub trait Branded: PrimInt {
-        fn brand(&self) -> Brand;
-    }
+pub trait Branded: PrimInt {
+    fn brand(&self) -> Brand;
 }
 
 boiler::expose!(
-    main,
     for_i8,
     for_i16,
     for_i32,
