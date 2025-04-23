@@ -1,5 +1,3 @@
-This document outlines thee structure and capabilities of the `Q` fixed point representation systeem built upon standard integer types, precision scaling (Q-format), and symbolic notation for large units.
-
 | Symbol |                                           |          |
 |--------|-------------------------------------------|----------|
 | K      | 1,000                                     | THOUSAND |
@@ -16,10 +14,10 @@ This document outlines thee structure and capabilities of the `Q` fixed point re
 | Type | Max                             | Min                               | Size |
 |------|---------------------------------|-----------------------------------|------|
 | u8   | 2.55E+02 (~255)                 | 0                                 | 1    |
-| u16  | 6.55E+04 (K ~65)                | 0                                 | 2    |
-| u32  | 4.29E+09 (B ~4)                 | 0                                 | 4    |
-| u64  | 1.84E+19 (E ~18.4A)             | 0                                 | 8    |
-| u128 | 3.40E+38 (Q ~340,282,366)       | 0                                 | 16   |
+| u16  | 6.55E+04 (~65.5K)               | 0                                 | 2    |
+| u32  | 4.29E+09 (~4.2B)                | 0                                 | 4    |
+| u64  | 1.84E+19 (~18.4EXA)             | 0                                 | 8    |
+| u128 | 3.40E+38 (~340,282,366.9QUETTA) | 0                                 | 16   |
 | i8   | 1.27E+02 (~127)                 | -1.28E+02 (~-128)                 | 1    |
 | i16  | 3.28E+04 (~32.7K)               | -3.28E+04 (~-32.7K)               | 2    |
 | i32  | 2.15E+09 (~2.1B)                | -2.15E+09 (~-2.1B)                | 4    |
@@ -27,7 +25,7 @@ This document outlines thee structure and capabilities of the `Q` fixed point re
 | i128 | 1.70E+38 (~170,141,183.4QUETTA) | -1.70E+38 (~-170,141,183.4QUETTA) | 16   |
 
 
-Any missing types to precision 38 are non representable or not whole numbers (too small) to be of relevant significance. Nominal values are rounded down, so the actual cap may be slightly higher than does shown.
+Any missing types to 38 are non representable. Nominal values are rounded down, so the actual cap may be slightly higher than does shown.
 
 ###### U8
 | Type  | Precision | Max Nominal    | Min Nominal |
@@ -38,7 +36,7 @@ Any missing types to precision 38 are non representable or not whole numbers (to
 ###### U16
 | Type   | Precision | Max Nominal       | Min Nominal |
 |--------|-----------|-------------------|-------------|
-| Q1U16  | 1         | 6.55E+03 (K ~6)   | 0           |
+| Q1U16  | 1         | 6.55E+03 (K ~6.5) | 0           |
 | Q2U16  | 2         | 6.55E+02 (~655)   | 0           |
 | Q3U16  | 3         | 6.55E+01 (~65)    | 0           |
 | Q4U16  | 4         | 6.55E+00 (~6)     | 0           |
@@ -104,8 +102,8 @@ u128
 |---------|-----------|-----------------------------------|
 | Q1U128  | 1         | 3.40282E+37 (Q ~34,028,236.6)     | 
 | Q2U128  | 2         | 3.40282E+36 (Q ~3,402,823.6)      |
-| Q3U128  | 3         | 3.40282E+35 (Q ~340,282.3)    |
-| Q4U128  | 4         | 3.40282E+34 (Q ~34,028.2)     |
+| Q3U128  | 3         | 3.40282E+35 (Q ~340,282.3)        |
+| Q4U128  | 4         | 3.40282E+34 (Q ~34,028.2)         |
 | Q5U128  | 5         | 3.40282E+33 (Q ~3402.8)
 | Q6U128  | 6         | 3.40282E+32 (Q ~340.2)
 | Q7U128  | 7         | 3.40282E+31 (Q ~34)
@@ -114,21 +112,21 @@ u128
 | Q10U128 | 10        | 3.40282E+28 (R ~34)
 | Q11U128 | 11        | 3.40282E+27 (R ~3.4)
 | Q12U128 | 12        | 3.40282E+26 (Y 340.2)
-| Q13U128 | 13        | 
-| Q14U128 | 14        |
-| Q15U128 | 15        |
-| Q16U128 | 16        |
-| Q17U128 | 17        |
-| Q18U128 | 18        |
-| Q19U128 | 19        |
-| Q20U128 | 20        |
-| Q21U128 | 21        |
-| Q22U128 | 22        |
-| Q23U128 | 23        |
-| Q24U128 | 24        |
-| Q25U128 | 25        |
-| Q26U128 | 26        |
-| Q27U128 | 27        |
+| Q13U128 | 13        | 3.40282E+25 (Y 34)
+| Q14U128 | 14        | 3.40282E+24 (Y 3.4)
+| Q15U128 | 15        | 3.40282E+23 ()
+| Q16U128 | 16        | 3.40282E+20 ()
+| Q17U128 | 17        | 3.40282E+19 ()
+| Q18U128 | 18        | 3.40282E+18 ()
+| Q19U128 | 19        | 3.40282E+17 ()
+| Q20U128 | 20        | 3.40282E+16 ()
+| Q21U128 | 21        | 3.40282E+15 ()
+| Q22U128 | 22        | 3.40282E+14 ()
+| Q23U128 | 23        | 3.40282E+13 ()
+| Q24U128 | 24        | 3.40282E+12 ()
+| Q25U128 | 25        | 3.40282E+11 ()
+| Q26U128 | 26        | 3.40282E+10 ()
+| Q27U128 | 27        | 3.
 | Q28U128 | 28        |
 | Q29U128 | 29        |
 | Q30U128 | 30        |
@@ -139,18 +137,4 @@ u128
 | Q35U128 | 35        |
 | Q36U128 | 36        |
 | Q37U128 | 37        |
-| Q38U128 | 38        | 
-
-
-
-
-
-###### I128
-| Q1I128 | 1 | 1.70E+38 | -1.70E+38 |
-| Q2I128 | 2 | 1.70E+
-
-### Remarks
-***Overflow Consideration***
-Fixed point systms require careful value bound checking espcially on high precision. Each `Q` type returns a `Result` on overflow or underflow.
-
-An increase in the maximum representable value proportionally decrases the possible precision.
+| Q38U128 | 38        |
