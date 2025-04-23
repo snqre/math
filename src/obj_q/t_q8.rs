@@ -1,3 +1,3 @@
 boiler::extend!();
 
-pub(super) type Q8<T: PrimInt> = Q<8u8, T>;
+pub type Q8<T: PrimInt> = Q<8u8, T>;

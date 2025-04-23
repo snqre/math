@@ -1,36 +1,19 @@
-# 📚 Module & Naming Conventions
+* Treat prefixed directories as large single modules. These directories must be flat, no nested subdirectories unless you are reexporting these directly at the mod.rs file, ie. a prelude. And these must not contain anymore nested modules. These should also be rare. Keep it strictly as flat as possible.
 
-This document outlines the naming and organizational conventions used in this Rust project to maintain clarity, consistency, and scalability across the codebase.
+* If for example you have an enum within an obj_ directory, you can add impls with this convention. enum_ext_my_impl, which keeps everything flat. again nested modules are strictly forbiden.
 
----
-
-## 📦 Module Prefixes
-
-We use **module name prefixes** to quickly identify the purpose of a module at a glance. This is especially helpful in flat module structures or large projects with many interrelated files.
-
-**All prefixes are kept under 4 characters** to keep the namespace clean and easily scannable.
-
-| Prefix     | Meaning                         | Example               | Description                                                                 |
-|------------|----------------------------------|-----------------------|------------------------------------------------------------------------------|
-| `m_`       | Model / Class-like Struct        | `m_user`, `m_color`   | Structs representing core domain entities. These can be single files or directories with related implementations (`ext_`). |
-| `tr_`      | Trait                            | `tr_displayable`      | Traits that define shared behavior or roles in the system.                 |
-| `ext_`     | Extensions / Implementations     | `ext_add`, `ext_i8`   | Modules that provide extension traits or additional impl blocks for types. |
-| `cfg_`     | Configuration                    | `cfg_env`, `cfg_db`   | Modules for managing environment config, settings, and constants.          |
-| `tst_`     | Tests / Fixtures / Helpers       | `tst_user`, `tst_utils` | Modules with test helpers, mock data, or integration test logic.         |
-
----
-
-## 📁 Folder Structure
-
-Whenever practical, modules are grouped into folders based on their roles. This provides a clean and discoverable layout without sacrificing granularity.
-
-model directory vs model file
+* Common modules that hold other modules or prefixed directories (items) do not need prefixes, and you can nest those as you like.
 
 
-[] - class / struct / enum
-c_ - collection
-tr_ - trait - impl for primite types or non native types
-may contain
-    for_
-    for diretly implementing the type for any other types in the module
-    especially if it is a local trait for something particular
+## obj_
+* mod file must contain the entitity.
+* Similar to a "class" will contain a struct, enum, or any implementable entitiy.
+* may put globally accesible imports at the mod file
+* May contain associated types as ie obj_car::Ford but not tr_ (traits). It may have functions however ie. obj_car::drive, or may have static functions on the object itself obj_car::Car::drive().
+* May contain an `Error` and `Result` specific to the object itself.
+* Image a Java Class but instead of writing it all in one file, it spans an entire directory.
+* Use ext_ to denote files as extensions to the object ie ext_truck.rs which helps to find these at a glance. These may contain structs or other items required related to them, or use private items as each ext_ is a submodule with its own scope, which gives great control.
+
+## tr_
+* mod file must contain the trait itself.
+* for_ used to denote implementations for this ie. for_i8. Useful for a place to put non native implementations, where you do not own the actual struct, enum, or primitive.

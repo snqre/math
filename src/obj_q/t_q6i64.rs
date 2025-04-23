@@ -1,3 +1,3 @@
 boiler::extend!();
 
-pub(super) type Q6I64 = Q6<i64>;
+pub type Q6I64 = Q6<i64>;

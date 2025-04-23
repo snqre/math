@@ -1,3 +1,3 @@
 boiler::extend!();
 
-pub(super) type Q12U64 = Q12<u64>;
+pub type Q12U64 = Q12<u64>;

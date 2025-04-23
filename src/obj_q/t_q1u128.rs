@@ -1,3 +1,3 @@
 boiler::extend!();
 
-pub(super) type Q1U128 = Q1<u128>;
+pub type Q1U128 = Q1<u128>;
