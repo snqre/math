@@ -12,5 +12,10 @@ version = "=0.2.19"
 [dependencies.thiserror]
 version = "=2.0.12"
 
+[features]
+default = []
+color = []
+coordinate = []
+
 [profile.dev]
 overflow-checks = true
