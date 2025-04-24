@@ -10,3 +10,4 @@ pub mod u32;
 pub mod u64;
 pub mod u128;
 pub mod usize;
+pub mod extend_int_macro;

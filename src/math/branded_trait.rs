@@ -2,6 +2,7 @@ pub trait BrandedTrait {
     fn brand(&self) -> BrandedTraitBrand;
 }
 
+#[repr(u8)]
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]

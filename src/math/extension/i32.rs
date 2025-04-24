@@ -1,25 +1,6 @@
-boiler::expose!(impl_branded, impl_sign_introspection);
-
+use crate::extend_integer;
 use crate::math::branded_trait::BrandedTrait;
 use crate::math::branded_trait::BrandedTraitBrand;
-use crate::math::sign_introspection_trait::SignIntrospectionTrait;
+use crate::math::sign_introspection_trait::SignIntrospectionTrait;            
 
-mod impl_branded {
-    boiler::extend!();
-
-    impl BrandedTrait for i32 {
-        fn brand(&self) -> BrandedTraitBrand {
-            BrandedTraitBrand::I32
-        }
-    }
-}
-
-mod impl_sign_introspection {
-    boiler::extend!();
-
-    impl SignIntrospectionTrait for i32 {
-        fn is_signed(&self) -> bool {
-            true
-        }
-    }
-}
+extend_integer!(i32, I32, true);
