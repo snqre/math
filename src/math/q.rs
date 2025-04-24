@@ -121,8 +121,7 @@ mod constructor {
 mod q {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait> QTrait<A, B> for Q<A, B> where Precision<A>: PrecisionTrait 
-        {}
+    impl<const A: u8, B: PrimIntTrait + BrandedTrait> QTrait<A, B> for Q<A, B> where Precision<A>: PrecisionTrait {}
 }
 
 mod cast {
@@ -773,7 +772,7 @@ mod sign_introspection {
         
         #[test]
         fn test() {
-            let x: Q<2u8, ii6> = q(500i16);
+            let x: Q<2u8, u16> = q(500u16);
             assert_eq!(x.is_signed(), true);
         }
     }
@@ -791,7 +790,14 @@ mod cap {
             B::min_value()
         }
     
-        pub fn max_rep_value(&self) -> B {
+        /// Returns the maximum nominal value considering the decimal precision.
+        ///
+        /// If the value is signed, uses `i128` arithmetic.
+        /// If unsigned, uses `u128` arithmetic.
+        ///
+        /// This essentially scales down the maximum stored value
+        /// to account for fixed-point precision.
+        pub fn max_nominal_value(&self) -> B {
             let decimals: u32 = A.into();
             if self.is_signed() {
                 let scale: i128 = 10i128.pow(decimals);
@@ -807,20 +813,82 @@ mod cap {
             return max_value
         }
     
-        pub fn min_rep_value(&self) -> B {
-            if A == 0u8 {
-                return self.min_value()
+        pub fn min_nominal_value(&self) -> B {
+            let decimals: u32 = A.into();
+            if self.is_signed() {
+                let scale: i128 = 10i128.pow(decimals);
+                let min_value: i128 = self.min_value().to_i128().unwrap();
+                let min_value: i128 = min_value / scale;
+                let min_value: B = B::from(min_value).unwrap();
+                return min_value
             }
-            if A > Q_MAX_PRECISION {
-                
-            }
-            self.max_rep_value() - (self.max_rep_value() * 2)
+            B::zero()
         }
     }
 }
 
 mod to_u8 {
     boiler::extend!();
+
+    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+        fn to_u8(&self) -> QTraitResult<u8> {
+            self._v.to_u8().ok_or(QTraitError::ConversionFailure)
+        }
+    }
+}
+
+mod conversion {
+    boiler::extend!();
+
+    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+        fn to_u8(&self) -> QTraitResult<u8> {
+            self._v.to_u8().ok_or(QTraitError::ConversionFailure)
+        }
+        
+        fn to_u16(&self) -> QTraitResult<u16> {
+            self._v.to_u16().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_u32(&self) -> QTraitResult<u32> {
+            self._v.to_u32().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_u64(&self) -> QTraitResult<u64> {
+            self._v.to_u64().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_u128(&self) -> QTraitResult<u128> {
+            self._v.to_u128().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_usize(&self) -> QTraitResult<usize> {
+            self._v.to_usize().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_i8(&self) -> QTraitResult<i8> {
+            self._v.to_i8().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_i16(&self) -> QTraitResult<i16> {
+            self._v.to_i16().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_i32(&self) -> QTraitResult<i32> {
+            self._v.to_i32().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_i64(&self) -> QTraitResult<i64> {
+            self._v.to_i64().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_i128(&self) -> QTraitResult<i128> {
+            self._v.to_i128().ok_or(QTraitError::ConversionFailure)
+        }
+
+        fn to_isize(&self) -> QTraitResult<isize> {
+            self._v.to_isize().ok_or(QTraitError::ConversionFailure)
+        }
+    }
 }
 
 mod try_into_u8 {
