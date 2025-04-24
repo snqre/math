@@ -11,9 +11,25 @@ version = "*"
 version = "=0.2.19"
 [dependencies.thiserror]
 version = "=2.0.12"
+[dependencies.ink]
+version = "*"
+optional = true
+[dependencies.parity-scale-codec]
+version = "3"
+features = ["derive"]
+optional = true
+[dependencies.scale-info]
+version = "2"
+features = ["derive"]
+optional = true
 
 [features]
-default = []
+default = ["ink"]
+ink = [
+    "dep:ink",
+    "dep:parity-scale-codec",
+    "dep:scale-info"    
+]
 color = []
 coordinate = []
 

@@ -1,5 +1,6 @@
 mod extension;
 mod generic;
+mod ink;
 mod branded_trait;
 mod precision_trait;
 mod precision;

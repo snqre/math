@@ -7,6 +7,10 @@ boiler::expose!(
     muldiv,
 );
 
+use crate::math::ink::maybe_decode_trait::MaybeDecodeTrait;
+use crate::math::ink::maybe_encode_trait::MaybeEncodeTrait;
+use crate::math::ink::maybe_storage_layout_trait::MaybeStorageLayoutTrait;
+use crate::math::ink::maybe_type_info_trait::MaybeTypeInfoTrait;
 use crate::math::sign_introspection_trait::SignIntrospectionTrait;
 use crate::math::precision::Precision;
 use crate::math::precision_trait::PrecisionTrait;
@@ -14,6 +18,9 @@ use crate::math::branded_trait::BrandedTrait;
 use crate::math::q_trait::QTrait;
 use crate::math::q_trait::QTraitError;
 use crate::math::q_trait::QTraitResult;
+use core::fmt::Debug as DebugTrait;
+use core::clone::Clone as CloneTrait;
+use core::marker::Copy as CopyTrait;
 use core::ops::Add as AddTrait;
 use core::ops::Sub as SubTrait;
 use core::ops::Mul as MulTrait;
@@ -27,17 +34,39 @@ use core::cmp::Ordering;
 use num_traits::int::PrimInt as PrimIntTrait;
 use num_traits::float::Float as FloatTrait;
 
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(Copy)]
-pub struct Q<const A: u8, B: PrimIntTrait> where Precision<A>: PrecisionTrait {
+#[cfg(feature = "ink")]
+use ink::scale::Encode as EncodeTrait;
+#[cfg(feature = "ink")]
+use ink::scale::Decode as DecodeTrait;
+#[cfg(feature = "ink")]
+use ink::scale_info::TypeInfo as TypeInfoTrait;
+#[cfg(feature = "ink")]
+use ink::storage::traits::StorageLayout as StorageLayoutTrait;
+
+#[derive(DebugTrait)]
+#[derive(CloneTrait)]
+#[derive(CopyTrait)]
+#[cfg_attr(feature = "ink", derive(EncodeTrait))]
+#[cfg_attr(feature = "ink", derive(DecodeTrait))]
+#[cfg_attr(feature = "ink", derive(TypeInfoTrait))]
+#[cfg_attr(feature = "ink", derive(StorageLayoutTrait))]
+pub struct Q<const A: u8, B> where
+    B: PrimIntTrait,
+    B: MaybeEncodeTrait,
+    B: MaybeDecodeTrait,
+    B: MaybeTypeInfoTrait,
+    B: MaybeStorageLayoutTrait,
+    Precision<A>: PrecisionTrait, {
     pub(super) _v: B,
 }
 
+#[cfg(not(feature = "ink"))]
 mod float_constructor {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait> Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where 
+        B: PrimIntTrait,
+        Precision<A>: PrecisionTrait {
     
         pub fn from_float<const C: u8, D: FloatTrait>(v: D) -> QTraitResult<Self> where Precision<C>: PrecisionTrait, {
             let decimals: u32 = A.into();
@@ -63,7 +92,7 @@ mod float_constructor {
         }
     }
 
-    pub fn qfl<const A: u8, B: FloatTrait, const C: u8, D: PrimIntTrait + BrandedTrait + SignIntrospectionTrait>(v: B) -> QTraitResult<Q<C, D>> 
+    pub fn q_fl<const A: u8, B: FloatTrait, const C: u8, D: PrimIntTrait + BrandedTrait + SignIntrospectionTrait>(v: B) -> QTraitResult<Q<C, D>> 
     where
         Precision<A>: PrecisionTrait,
         Precision<C>: PrecisionTrait, {
@@ -76,7 +105,7 @@ mod float_constructor {
 
         #[test]
         fn test() {
-            let x: Q<2u8, u128> = qfl::<2u8, f32, 2u8, u128>(56.48f32);
+            let x: Q<2u8, u128> = q_fl::<2u8, f32, 2u8, u128>(56.48f32);
         }
     }
 }
@@ -84,15 +113,41 @@ mod float_constructor {
 mod int_constructor {
     boiler::extend!();
 
-    pub fn q_int<const A: u8, B: PrimIntTrait, const C: u8, D: PrimIntTrait + BrandedTrait + SignIntrospectionTrait>(v: B) -> QTraitResult<Q::<C, D>> where 
+    pub fn q_int<const A: u8, B, const C: u8, D>(v: B) -> QTraitResult<Q::<C, D>> where 
+        B: PrimIntTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        D: PrimIntTrait,
+        D: BrandedTrait,
+        D: SignIntrospectionTrait,
+        D: MaybeEncodeTrait,
+        D: MaybeDecodeTrait,
+        D: MaybeTypeInfoTrait,
+        D: MaybeStorageLayoutTrait,
         Precision<A>: PrecisionTrait,
         Precision<C>: PrecisionTrait, {
         Q::new_from_int::<A, B>(v)
     }
     
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait {
-     
-        pub fn new_from_int<const C: u8, D: PrimIntTrait>(v: D) -> QTraitResult<Self> where Precision<C>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait {
+
+        pub fn new_from_int<const C: u8, D>(v: D) -> QTraitResult<Self> where 
+            D: PrimIntTrait,
+            D: MaybeEncodeTrait,
+            D: MaybeDecodeTrait,
+            D: MaybeTypeInfoTrait,
+            D: MaybeStorageLayoutTrait,
+            Precision<C>: PrecisionTrait {
             let v: B = B::from(v).ok_or(QTraitError::ConversionFailure)?;
             let v: Q<C, B> = q(v);
             let v: Q<A, B> = v.cast()?;
@@ -104,7 +159,14 @@ mod int_constructor {
 mod constructor {
     boiler::extend!();
     
-    impl<const A: u8, B: PrimIntTrait> Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+        
         pub fn new(v: B) -> Self {
             debug_assert!(matches!(A, 1u8..=38u8));
             Self {
@@ -113,7 +175,13 @@ mod constructor {
         }
     }
 
-    pub fn q<const A: u8, B: PrimIntTrait>(v: B) -> Q<A, B> where Precision<A>: PrecisionTrait {
+    pub fn q<const A: u8, B>(v: B) -> Q<A, B> where
+        B: PrimIntTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         Q::new(v)
     }
 }
@@ -127,8 +195,25 @@ mod q {
 mod cast {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait {
-        pub fn cast<const C: u8>(&self) -> QTraitResult<Q<C, B>> where Precision<C>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
+        pub fn cast<const C: u8>(&self) -> QTraitResult<Q<C, B>> where
+            B: PrimIntTrait,
+            B: BrandedTrait,
+            B: SignIntrospectionTrait,
+            B: MaybeEncodeTrait,
+            B: MaybeDecodeTrait,
+            B: MaybeTypeInfoTrait,
+            B: MaybeStorageLayoutTrait,
+            Precision<C>: PrecisionTrait, {
             if A == C {
                 return Ok(q(self._v))
             }
@@ -172,7 +257,16 @@ mod cast {
 mod rem {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> RemTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> RemTrait for Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Output = QTraitResult<Self>;
     
         fn rem(self, rhs: Self) -> Self::Output {
@@ -205,7 +299,15 @@ mod rem {
 mod add {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait> AddTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> AddTrait for Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Output = QTraitResult<Self>;
     
         fn add(self, rhs: Self) -> Self::Output {
@@ -236,7 +338,15 @@ mod add {
 mod sub {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait> SubTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> SubTrait for Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+        
         type Output = QTraitResult<Self>;
     
         fn sub(self, rhs: Self) -> Self::Output {
@@ -254,7 +364,16 @@ mod sub {
 mod mul {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> MulTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> MulTrait for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Output = QTraitResult<Self>;
     
         fn mul(self, rhs: Self) -> Self::Output {
@@ -269,7 +388,15 @@ mod mul {
 mod fallback_mul {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
     
         /// Performs multiplication with a fallback strategy for enhanced robustness.
         ///
@@ -315,7 +442,15 @@ mod fallback_mul {
 mod newton_raphson_inverse_mul {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
 
         pub fn mul_with_newton_raphson_inverse(self, rhs: Self) -> QTraitResult<Self> {
             let x: &Self = &self;
@@ -339,7 +474,15 @@ mod newton_raphson_inverse_mul {
 mod bit_simulated_mul {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         
         pub fn mul_with_bit_simulation(self, rhs: Self) -> QTraitResult<Self> {
             let x: &Self = &self;
@@ -358,7 +501,15 @@ mod bit_simulated_mul {
 mod native_mul {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         
         pub fn mul_with_native(self, rhs: Self) -> QTraitResult<Self> {
             let x: &Self = &self;
@@ -377,7 +528,15 @@ mod native_mul {
 mod muldiv {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
 
         pub(super) fn _mul<'l1>(data: _MulDivData<'l1, A, B>) -> QTraitResult<Self> {
             let decimals: u32 = A.into();
@@ -676,7 +835,15 @@ mod muldiv {
         }
     }
 
-    pub(super) struct _MulDivData<'l1, const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> where Precision<A>: PrecisionTrait, {
+    pub(super) struct _MulDivData<'l1, const A: u8, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         pub x: &'l1 Q<A, B>,
         pub y: &'l1 Q<A, B>,
         pub u128_muldiv_algo: &'l1 _U128MuldivAlgo,
@@ -691,7 +858,15 @@ mod muldiv {
 mod div {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait + SignIntrospectionTrait> DivTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> DivTrait for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         type Output = QTraitResult<Self>;
     
         fn div(self, rhs: Self) -> Self::Output {
@@ -760,7 +935,14 @@ mod div {
 mod sign_introspection {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> SignIntrospectionTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> SignIntrospectionTrait for Q<A, B> where
+        B: PrimIntTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         fn is_signed(&self) -> bool {
             self._v.is_signed()
         }
@@ -781,7 +963,16 @@ mod sign_introspection {
 mod cap {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         pub fn max_value(&self) -> B {
             B::max_value()
         }
@@ -827,20 +1018,19 @@ mod cap {
     }
 }
 
-mod to_u8 {
-    boiler::extend!();
-
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
-        fn to_u8(&self) -> QTraitResult<u8> {
-            self._v.to_u8().ok_or(QTraitError::ConversionFailure)
-        }
-    }
-}
-
 mod conversion {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where Precision<A>: PrecisionTrait, {
+    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         fn to_u8(&self) -> QTraitResult<u8> {
             self._v.to_u8().ok_or(QTraitError::ConversionFailure)
         }
@@ -894,7 +1084,16 @@ mod conversion {
 mod try_into_u8 {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> TryIntoTrait<u8> for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> TryIntoTrait<u8> for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Error = QTraitError;
         
         fn try_into(self) -> Result<u8, Self::Error> {
@@ -924,7 +1123,16 @@ mod try_into_u8 {
 mod try_into_u16 {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> TryIntoTrait<u16> for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> TryIntoTrait<u16> for Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Error = QTraitError;
         
         fn try_into(self) -> Result<u16, Self::Error> {
@@ -967,7 +1175,16 @@ mod try_into_u16 {
 mod try_into_u32 {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> TryIntoTrait<u32> for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> TryIntoTrait<u32> for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         type Error = QTraitError;
         
         fn try_into(self) -> Result<u32, Self::Error> {
@@ -997,7 +1214,16 @@ mod try_into_u32 {
 mod try_from_u16 {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + SignIntrospectionTrait> TryFromTrait<u16> for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> TryFromTrait<u16> for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: SignIntrospectionTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+            
         type Error = QTraitError;
         
         fn try_from(value: u16) -> Result<Self, Self::Error> {
@@ -1027,7 +1253,15 @@ mod try_from_u16 {
 mod partial_ord {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait> PartialOrd for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> PartialOrd for Q<A, B> where
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         fn gt(&self, other: &Self) -> bool {
             let x: &Self = self;
             let y: &Self = other;
@@ -1064,13 +1298,23 @@ mod partial_ord {
 mod ord {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait + BrandedTrait> Ord for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> Ord for Q<A, B> where 
+        B: PrimIntTrait,
+        B: BrandedTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
+
         fn clamp(self, min: Self, max: Self) -> Self {
-            match (self > max, self < min) {
-                (true, _) => max,
-                (_, true) => min,
-                (_, _) => self,
+            if self > max {
+                return max
             }
+            if self < min {
+                return min
+            }
+            self
         }
     
         fn max(self, other: Self) -> Self {
@@ -1110,7 +1354,13 @@ mod ord {
 mod partial_eq {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait> PartialEqTrait for Q<A, B> where Precision<A>: PrecisionTrait {
+    impl<const A: u8, B> PartialEqTrait for Q<A, B> where 
+        B: PrimIntTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, {
         
         fn eq(&self, other: &Self) -> bool {
             let x: &Self = self;
@@ -1125,5 +1375,12 @@ mod partial_eq {
 mod eq {
     boiler::extend!();
 
-    impl<const A: u8, B: PrimIntTrait> EqTrait for Q<A, B> where Precision<A>: PrecisionTrait {}
+    impl<const A: u8, B> EqTrait for Q<A, B> where 
+        B: PrimIntTrait,
+        B: MaybeEncodeTrait,
+        B: MaybeDecodeTrait,
+        B: MaybeTypeInfoTrait,
+        B: MaybeStorageLayoutTrait,
+        Precision<A>: PrecisionTrait, 
+    {}
 }
