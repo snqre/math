@@ -2,6 +2,9 @@
 name = "math"
 version = "0.1.0"
 edition = "2024"
+
+[dependencies]
+rand = "0.9.1"
 [dependencies.boiler]
 version = "*"
 git = "https://github.com/snqre/boiler.git"
@@ -23,6 +26,9 @@ version = "2"
 features = ["derive"]
 optional = true
 
+[dev-dependencies]
+criterion = { version = "0.5.1" }
+
 [features]
 default = ["ink"]
 ink = [
@@ -35,3 +41,10 @@ coordinate = []
 
 [profile.dev]
 overflow-checks = true
+
+
+# === benchmark ===
+
+[[bench]]
+name = "q"
+harness = false
