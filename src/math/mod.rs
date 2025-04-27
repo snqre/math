@@ -1,10 +1,6 @@
-pub mod extension;
-pub mod generic;
-pub mod ink;
-pub mod branded_trait;
-pub mod precision_trait;
-pub mod precision;
-pub mod q_trait;
-pub mod q;
-mod sign_introspection_trait;
-mod mul_div_engine;
+pub mod component;
+pub mod primitive_extension;
+pub mod util;
+pub mod util_trait;
+#[allow(non_snake_case)]
+pub mod Q;

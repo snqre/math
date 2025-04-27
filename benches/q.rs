@@ -1,4 +1,4 @@
-use math::math::q::*;
+use math::math::Q::*;
 use criterion::*;
 
 #[macro_export]

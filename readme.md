@@ -17,3 +17,21 @@
 ## tr_
 * mod file must contain the trait itself.
 * for_ used to denote implementations for this ie. for_i8. Useful for a place to put non native implementations, where you do not own the actual struct, enum, or primitive.
+
+
+# import
+# primary-data - struct/enum
+# mod core_ ? associated data
+# mod main_ ? a main impl if any
+# ie mod add {
+    boiler::extend!();
+
+    impl Add for PrimaryData {
+
+    }
+}
+# boiler::expose!(
+    core_,
+    main_,
+    ...
+);
