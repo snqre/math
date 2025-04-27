@@ -1,7 +1,7 @@
 use crate::math::util::is_compatible_precision::IsCompatiblePrecision;
 
 #[repr(transparent)]
-pub struct Precision<const A: u8>;
+pub struct Precision<const PRECISION_: u8>;
 
 impl IsCompatiblePrecision for Precision<1u8> {}
 

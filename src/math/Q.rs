@@ -1,3 +1,4 @@
+use crate::math::util_trait::is_int::IsInt;
 use crate::math::util_trait::has_brand::HasBrand;
 use crate::math::util_trait::has_brand::Brand;
 use crate::math::util_trait::has_sign_introspection::HasSignIntrospection;
@@ -8,79 +9,96 @@ use crate::math::util_trait::ink::maybe_has_type_info::MaybeHasTypeInfo;
 use crate::math::util::is_compatible_precision::IsCompatiblePrecision;
 use crate::math::util::precision::Precision;
 use crate::math::component::BitSimulatedMulDivEngine;
+use ::core::cmp::Ordering;
 use ::core::ops::Add;
 use ::core::ops::Sub;
 use ::core::ops::Mul;
 use ::core::ops::Div;
+use ::core::ops::Rem;
 use ::num_traits::int::PrimInt as PrimInt;
 
-pub trait IsMulDivEngine
-    where
-        Self: Clone {
-
+pub trait IsMulDivEngine: Clone {
     fn algorithm(&self) -> Algorithm;
-    fn cast<const T_OLD_PRECISION: u8, const T_NEW_PRECISION: u8, TInteger, TEngine>(&self, current: &Q<T_OLD_PRECISION, TInteger, TEngine>, algo: &Algorithm) -> Result<Q<T_NEW_PRECISION, TInteger, TEngine>>
+    fn cast<const A: u8, const B: u8, C: IsInt + HasBrand + HasSignIntrospection, D: IsMulDivEngine>(&self, current: &Q<A, C, D>, algorithm: &Algorithm) -> Result<Q<B, C, D>>
         where
-            TInteger: PrimInt,
-            TInteger: HasBrand,
-            TInteger: HasSignIntrospection,
-            TInteger: MaybeHasDecode,
-            TInteger: MaybeHasEncode,
-            TInteger: MaybeHasStorageLayout,
-            TInteger: MaybeHasTypeInfo,
-            TEngine: IsMulDivEngine,
-            Precision<T_OLD_PRECISION>: IsCompatiblePrecision,
-            Precision<T_NEW_PRECISION>: IsCompatiblePrecision;
-    fn mul<const T_PRECISION: u8, TInteger, TEngine>(&self, data: &Data<'_, T_PRECISION, TInteger, TEngine>) -> Result<Q<T_PRECISION, TInteger, TEngine>>
-        where
-            TInteger: PrimInt,
-            TInteger: HasBrand,
-            TInteger: HasSignIntrospection,
-            TInteger: MaybeHasDecode,
-            TInteger: MaybeHasEncode,
-            TInteger: MaybeHasStorageLayout,
-            TInteger: MaybeHasTypeInfo,
-            TEngine: IsMulDivEngine,
-            Precision<T_PRECISION>: IsCompatiblePrecision;
-    fn div<const T_PRECISION: u8, TInteger, TEngine>(&self, data: &Data<'_, T_PRECISION, TInteger, TEngine>) -> Result<Q<T_PRECISION, TInteger, TEngine>>
-        where
-            TInteger: PrimInt,
-            TInteger: HasBrand,
-            TInteger: HasSignIntrospection,
-            TInteger: MaybeHasDecode,
-            TInteger: MaybeHasEncode,
-            TInteger: MaybeHasStorageLayout,
-            TInteger: MaybeHasTypeInfo,
-            TEngine: IsMulDivEngine,
-            Precision<T_PRECISION>: IsCompatiblePrecision;
+            Precision<A>: IsCompatiblePrecision,
+            Precision<B>: IsCompatiblePrecision;
+    fn mul<const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine>(&self, data: &Data<A, B, C>) -> Result<Q<A, B, C>> where Precision<A>: IsCompatiblePrecision;
+    fn div<const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine>(&self, data: &Data<A, B, C>) -> Result<Q<A, B, C>> where Precision<A>: IsCompatiblePrecision;
 }
 pub type Algorithm = (U128Algorithm, I128Algorithm);   
 pub type U128Algorithm = fn(u128, u128, u128) -> Result<u128>;
 pub type I128Algorithm = fn(i128, i128, i128) -> Result<i128>;
 #[derive(Debug)]
 #[derive(Clone)]
-pub struct Data<'l1, const T_PRECISION: u8, TInteger, TEngine> 
-    where
-        TInteger: PrimInt,
-        TInteger: HasBrand,
-        TInteger: HasSignIntrospection,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
-    pub x: &'l1 Q<T_PRECISION, TInteger, TEngine>,
-    pub y: &'l1 Q<T_PRECISION, TInteger, TEngine>,
-    pub algorithm: &'l1 Algorithm
+pub struct Data<'a, const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine> where Precision<A>: IsCompatiblePrecision {
+    pub x: &'a Q<A, B, C>,
+    pub y: &'a Q<A, B, C>,
+    pub algorithm: &'a Algorithm
 }
 
-pub type Q1<TInteger> = Q<1u8, TInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine>;
-pub type Q2<TInteger> = Q<2u8, TInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine>;
-pub type Q3<TInteger> = Q<3u8, TInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine>;
-pub type Q4<TInteger> = Q<4u8, TInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine>;
+pub type Q1U8 = Q1<u8>;
+pub type Q2U8 = Q2<u8>;
+pub type Q1U16 = Q1<u16>;
+pub type Q2U16 = Q2<u16>;
+pub type Q3U16 = Q3<u16>;
+pub type Q4U16 = Q4<u16>;
+pub type Q1U32 = Q1<u32>;
+pub type Q2U32 = Q2<u32>;
+pub type Q3U32 = Q3<u32>;
+pub type Q4U32 = Q4<u32>;
+pub type Q5U32 = Q5<u32>;
+pub type Q6U32 = Q6<u32>;
+pub type Q7U32 = Q7<u32>;
+pub type Q8U32 = Q8<u32>;
+pub type Q9U32 = Q9<u32>;
+pub type Q1U64 = Q1<u64>;
+pub type Q2U64 = Q2<u64>;
+pub type Q3U64 = Q3<u64>;
 
-pub type Result<TOk> = core::result::Result<TOk, Error>;
+pub type Q1<T> = Q<1u8, T, _Engine>;
+pub type Q2<T> = Q<2u8, T, _Engine>;
+pub type Q3<T> = Q<3u8, T, _Engine>;
+pub type Q4<T> = Q<4u8, T, _Engine>;
+pub type Q5<T> = Q<5u8, T, _Engine>;
+pub type Q6<T> = Q<6u8, T, _Engine>;
+pub type Q7<T> = Q<7u8, T, _Engine>;
+pub type Q8<T> = Q<8u8, T, _Engine>;
+pub type Q9<T> = Q<9u8, T, _Engine>;
+pub type Q10<T> = Q<10u8, T, _Engine>;
+pub type Q11<T> = Q<11u8, T, _Engine>;
+pub type Q12<T> = Q<12u8, T, _Engine>;
+pub type Q13<T> = Q<13u8, T, _Engine>;
+pub type Q14<T> = Q<14u8, T, _Engine>;
+pub type Q15<T> = Q<15u8, T, _Engine>;
+pub type Q16<T> = Q<16u8, T, _Engine>;
+pub type Q17<T> = Q<17u8, T, _Engine>;
+pub type Q18<T> = Q<18u8, T, _Engine>;
+pub type Q19<T> = Q<19u8, T, _Engine>;
+pub type Q20<T> = Q<20u8, T, _Engine>;
+pub type Q21<T> = Q<21u8, T, _Engine>;
+pub type Q22<T> = Q<22u8, T, _Engine>;
+pub type Q23<T> = Q<23u8, T, _Engine>;
+pub type Q24<T> = Q<24u8, T, _Engine>;
+pub type Q25<T> = Q<25u8, T, _Engine>;
+pub type Q26<T> = Q<26u8, T, _Engine>;
+pub type Q27<T> = Q<27u8, T, _Engine>;
+pub type Q28<T> = Q<28u8, T, _Engine>;
+pub type Q29<T> = Q<29u8, T, _Engine>;
+pub type Q30<T> = Q<30u8, T, _Engine>;
+pub type Q31<T> = Q<31u8, T, _Engine>;
+pub type Q32<T> = Q<32u8, T, _Engine>;
+pub type Q33<T> = Q<33u8, T, _Engine>;
+pub type Q34<T> = Q<34u8, T, _Engine>;
+pub type Q35<T> = Q<35u8, T, _Engine>;
+pub type Q36<T> = Q<36u8, T, _Engine>;
+pub type Q37<T> = Q<37u8, T, _Engine>;
+pub type Q38<T> = Q<38u8, T, _Engine>;
+type _Engine = BitSimulatedMulDivEngine::BitSimulatedMulDivEngine;
+
+
+
+pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
@@ -91,9 +109,11 @@ pub enum Error {
     #[error("Q: Value cannot be represented.")]
     Underflow,
     #[error("Q: Divisor cannot be zero.")]
-    DivisionByZero,
+    DivByZero,
+    #[error("")]
+    RemByZero,
     #[error("Q: Cannot safely be converted to the new type.")]
-    UnsupportedConversion,
+    UnsupportedConversion
 }
 
 #[derive(Debug)]
@@ -103,87 +123,79 @@ pub enum Error {
 #[cfg_attr(feature = "ink", derive(ink::scale::Decode))]
 #[cfg_attr(feature = "ink", derive(ink::scale_info::TypeInfo))]
 #[cfg_attr(feature = "ink", derive(ink::storage::traits::StorageLayout))]
-pub struct Q<const T_PRECISION: u8, TInteger, TEngine> 
-    where 
-        TInteger: PrimInt,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
-    pub(crate) _v: TInteger,
-    pub(crate) _engine: TEngine
+pub struct Q<const A: u8, B: IsInt, C: IsMulDivEngine> where Precision<A>: IsCompatiblePrecision {
+    pub(super) _v: B,
+    pub(super) _engine: C
 }
 
-impl<const T_PRECISION: u8, TInteger, TEngine> Add for Q<T_PRECISION, TInteger, TEngine> 
-    where 
-        TInteger: PrimInt,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine> Rem for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
+
+    type Output = Result<Self>;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        let x: &Self = &self;
+        let y: &Self = &rhs;
+        if x.is_signed() && y.is_signed() {
+            let v_0: i128 = x._v.to_i128().unwrap();
+            let v_1: i128 = y._v.to_i128().unwrap();
+            if v_1 == 0i128 {
+                return Err(Error::DivByZero)
+            }
+            let v_2: i128 = v_0.checked_rem(v_1).ok_or(Error::RemByZero)?;
+            let v_2: B = B::from(v_2).unwrap();
+            return Ok(new_with_custom_engine(v_2, x._engine.clone()))   
+        }
+        debug_assert!(!x.is_signed());
+        debug_assert!(!y.is_signed());
+        let v_0: u128 = x._v.to_u128().unwrap();
+        let v_1: u128 = y._v.to_u128().unwrap();
+        if v_1 == 0u128 {
+            return Err(Error::DivByZero)
+        }
+        let v_2: u128 = v_0.checked_rem(v_1).ok_or(Error::RemByZero)?;
+        let v_2: B = B::from(v_2).unwrap();
+        Ok(new_with_custom_engine(v_2, x._engine.clone()))
+    }
+}
+
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> Add for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
 
     type Output = Result<Self>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        use Error::*;
-        let engine: TEngine = self._engine.clone();
+        let engine: C = self._engine.clone();
         let x: &Self = &self;
         let y: &Self = &rhs;
-        let v_0: TInteger = x._v;
-        let v_1: TInteger = y._v;
-        let v_2: TInteger = v_0.checked_add(&v_1).ok_or(Overflow)?;
-        let v_2: Self = new_with_custom_engine(v_2, engine);
-        Ok(v_2)
+        let value_0: B = x._v;
+        let value_1: B = y._v;
+        let value_2: B = value_0.checked_add(&value_1).ok_or(Error::Overflow)?;
+        Ok(new_with_custom_engine(value_2, engine))
     }
 }
 
-impl<const T_PRECISION: u8, TInteger, TEngine> Sub for Q<T_PRECISION, TInteger, TEngine>
-    where 
-        TInteger: PrimInt,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> Sub for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
     
     type Output = Result<Self>;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        use Error::*;
-        let engine: TEngine = self._engine.clone();
+        let engine: C = self._engine.clone();
         let x: &Self = &self;
         let y: &Self = &rhs;
-        let v_0: TInteger = x._v;
-        let v_1: TInteger = y._v;
-        let v_2: TInteger = v_0.checked_sub(&v_1).ok_or(Overflow)?;
-        let v_2: Self = new_with_custom_engine(v_2, engine);
-        Ok(v_2)
+        let value_0: B = x._v;
+        let value_1: B = y._v;
+        let value_2: B = value_0.checked_sub(&value_1).ok_or(Error::Overflow)?;
+        Ok(new_with_custom_engine(value_2, engine))
     }
 }
 
-impl<const T_PRECISION: u8, TInteger, TEngine> Mul for Q<T_PRECISION, TInteger, TEngine> 
-    where
-        TInteger: PrimInt,
-        TInteger: HasBrand,
-        TInteger: HasSignIntrospection,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine> Mul for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
     
     type Output = Result<Self>;
 
     fn mul(self, rhs: Self) -> Self::Output {
         let x: &Self = &self;
         let y: &Self = &rhs;
-        let data: Data<'_, T_PRECISION, TInteger, TEngine> = Data {
+        let data: Data<'_, A, B, C> = Data {
             x,
             y,
             algorithm: &self._engine.algorithm()
@@ -192,24 +204,14 @@ impl<const T_PRECISION: u8, TInteger, TEngine> Mul for Q<T_PRECISION, TInteger, 
     }
 }
 
-impl<const T_PRECISION: u8, TInteger, TEngine> Div for Q<T_PRECISION, TInteger, TEngine>
-    where
-        TInteger: PrimInt,
-        TInteger: HasBrand,
-        TInteger: HasSignIntrospection,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt + HasBrand + HasSignIntrospection, C: IsMulDivEngine> Div for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
     
     type Output = Result<Self>;
 
     fn div(self, rhs: Self) -> Self::Output {
         let x: &Self = &self;
         let y: &Self = &rhs;
-        let data: Data<'_, T_PRECISION, TInteger, TEngine> = Data {
+        let data: Data<'_, A, B, C> = Data {
             x,
             y,
             algorithm: &self._engine.algorithm()
@@ -218,16 +220,7 @@ impl<const T_PRECISION: u8, TInteger, TEngine> Div for Q<T_PRECISION, TInteger, 
     }
 }
 
-impl<const A: u8, B, C> Q<A, B, C> 
-    where
-        B: PrimInt,
-        B: HasSignIntrospection,
-        B: MaybeHasDecode,
-        B: MaybeHasEncode,
-        B: MaybeHasStorageLayout,
-        B: MaybeHasTypeInfo,
-        C: IsMulDivEngine,
-        Precision<A>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt + HasSignIntrospection, C: IsMulDivEngine> Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
     
     pub fn max_underlying_value(&self) -> B {
         B::max_value()
@@ -238,32 +231,103 @@ impl<const A: u8, B, C> Q<A, B, C>
     }
 }
 
-impl<const A: u8, B, C> HasSignIntrospection for Q<A, B, C> 
-    where
-        B: PrimInt,
-        B: HasSignIntrospection,
-        B: MaybeHasDecode,
-        B: MaybeHasEncode,
-        B: MaybeHasStorageLayout,
-        B: MaybeHasTypeInfo,
-        C: IsMulDivEngine,
-        Precision<A>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> PartialOrd for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
+
+    fn gt(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v > y._v
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v < y._v
+    }
+
+    fn ge(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v >= y._v
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v <= y._v
+    }
+
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> Ord for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
+
+    fn clamp(self, min: Self, max: Self) -> Self {
+        if self > max {
+            return max
+        }
+        if self < min {
+            return min
+        }
+        self
+    }
+
+    fn max(self, other: Self) -> Self {
+        let x: &Self = &self;
+        let y: &Self = &other;
+        let v_0: B = x._v;
+        let v_1: B = y._v;
+        let v_2: B = v_0.max(v_1);
+        if v_2 == v_0 {
+            return new_with_custom_engine(v_0, x._engine.clone())
+        } 
+        new_with_custom_engine(v_1, x._engine.clone())
+    }
+
+    fn min(self, other: Self) -> Self {
+        let x: &Self = &self;
+        let y: &Self = &other;
+        let v_0: B = x._v;
+        let v_1: B = y._v;
+        let v_2: B = v_0.min(v_1);
+        if v_2 == v_0 {
+            return new_with_custom_engine(v_0, x._engine.clone())
+        }
+        new_with_custom_engine(v_1, x._engine.clone())
+    }
+
+    fn cmp(&self, other: &Self) -> Ordering {
+        let x: &Self = self;
+        let y: &Self = other;
+        let v_0: B = x._v;
+        let v_1: B = y._v;
+        v_0.cmp(&v_1)
+    }
+}
+
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> PartialEq for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
+
+    fn eq(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        let v_0: &B = &x._v;
+        let v_1: &B = &y._v;
+        v_0 == v_1
+    }
+}
+
+impl<const A: u8, B: IsInt, C: IsMulDivEngine> Eq for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {}
+
+impl<const A: u8, B: IsInt + HasSignIntrospection, C: IsMulDivEngine> HasSignIntrospection for Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
 
     fn is_signed(&self) -> bool {
         self._v.is_signed()
     }
 }
 
-impl<const A: u8, B, C> Q<A, B, C>
-    where
-        B: PrimInt,
-        B: HasSignIntrospection,
-        B: MaybeHasDecode,
-        B: MaybeHasEncode,
-        B: MaybeHasStorageLayout,
-        B: MaybeHasTypeInfo,
-        C: IsMulDivEngine,
-        Precision<A>: IsCompatiblePrecision {
+impl<const A: u8, B: IsInt + HasSignIntrospection, C: IsMulDivEngine> Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
 
     pub fn to_u128(&self) -> Result<u128> {
         self._v.to_u128().ok_or(Error::UnsupportedConversion)
@@ -307,84 +371,53 @@ impl<const A: u8, B, C> Q<A, B, C>
 
 }
 
-pub fn new<const T_PRECISION: u8, TInteger>(v: TInteger) -> Q<T_PRECISION, TInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine> 
-    where 
-        TInteger: PrimInt,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
-    debug_assert!(matches!(T_PRECISION, 1u8..=38u8));
+pub fn new<const A: u8, B: IsInt>(v: B) -> Q<A, B, _Engine> where Precision<A>: IsCompatiblePrecision {
+    debug_assert!(matches!(A, 1u8..=38u8));
     Q {
         _v: v,
         _engine: BitSimulatedMulDivEngine::BitSimulatedMulDivEngine
     }
 }
 
-pub fn new_with_custom_engine<const T_PRECISION: u8, TInteger, TEngine>(v: TInteger, engine: TEngine) -> Q<T_PRECISION, TInteger, TEngine>
-    where
-        TInteger: PrimInt,
-        TInteger: MaybeHasDecode,
-        TInteger: MaybeHasEncode,
-        TInteger: MaybeHasStorageLayout,
-        TInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_PRECISION>: IsCompatiblePrecision {
-    debug_assert!(matches!(T_PRECISION, 1u8..=38u8));
+pub fn new_with_custom_engine<const A: u8, B: IsInt, C: IsMulDivEngine>(value: B, engine: C) -> Q<A, B, C> where Precision<A>: IsCompatiblePrecision {
+    debug_assert!(matches!(A, 1u8..=38u8));
     Q {
-        _v: v,
+        _v: value,
         _engine: engine
     }
 }
 
-pub fn new_from_integer<const T_OLD_PRECISION: u8, const T_NEW_PRECISION: u8, TOldInteger, TNewInteger>(value: TOldInteger) -> Result<Q<T_NEW_PRECISION, TNewInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine>> 
+pub fn new_from_integer<
+    const A: u8, 
+    const B: u8, 
+    C: IsInt + HasBrand + HasSignIntrospection, 
+    D: IsInt + HasBrand + HasSignIntrospection>(value: C) -> Result<Q<B, D, _Engine>> 
     where
-        TOldInteger: PrimInt,
-        TOldInteger: HasBrand,
-        TOldInteger: HasSignIntrospection,
-        TOldInteger: MaybeHasDecode,
-        TOldInteger: MaybeHasEncode,
-        TOldInteger: MaybeHasStorageLayout,
-        TOldInteger: MaybeHasTypeInfo,
-        TNewInteger: PrimInt,
-        TNewInteger: HasBrand,
-        TNewInteger: HasSignIntrospection,
-        TNewInteger: MaybeHasDecode,
-        TNewInteger: MaybeHasEncode,
-        TNewInteger: MaybeHasStorageLayout,
-        TNewInteger: MaybeHasTypeInfo,
-        Precision<T_OLD_PRECISION>: IsCompatiblePrecision,
-        Precision<T_NEW_PRECISION>: IsCompatiblePrecision {
-    let value: TNewInteger = TNewInteger::from(value).ok_or(Error::UnsupportedConversion)?;
-    let value: Q<T_OLD_PRECISION, TNewInteger, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine> = new(value);
-    let engine: BitSimulatedMulDivEngine::BitSimulatedMulDivEngine = BitSimulatedMulDivEngine::default();
+        Precision<A>: IsCompatiblePrecision,
+        Precision<B>: IsCompatiblePrecision {
+    debug_assert!(matches!(A, 1u8..=38u8));
+    debug_assert!(matches!(B, 1u8..=38u8));
+    let value: D = D::from(value).ok_or(Error::UnsupportedConversion)?;
+    let value: Q<A, D, BitSimulatedMulDivEngine::BitSimulatedMulDivEngine> = new(value);
+    let engine: _Engine = BitSimulatedMulDivEngine::default();
     let algorithm: Algorithm = engine.algorithm();
     engine.cast(&value, &algorithm)
 }
-
-pub fn new_from_integer_with_custom_engine<const T_OLD_PRECISION: u8, const T_NEW_PRECISION: u8, TOldInteger, TNewInteger, TEngine>(value: TOldInteger, engine: TEngine) -> Result<Q<T_NEW_PRECISION, TNewInteger, TEngine>> 
+ 
+pub fn new_from_integer_with_custom_engine<
+    const A: u8, 
+    const B: u8, 
+    C: IsInt + HasBrand + HasSignIntrospection,
+    D: IsInt + HasBrand + HasSignIntrospection, 
+    E: IsMulDivEngine>(value: C, engine: E) -> Result<Q<B, D, E>> 
     where
-        TOldInteger: PrimInt,
-        TOldInteger: HasBrand,
-        TOldInteger: HasSignIntrospection,
-        TOldInteger: MaybeHasDecode,
-        TOldInteger: MaybeHasEncode,
-        TOldInteger: MaybeHasStorageLayout,
-        TOldInteger: MaybeHasTypeInfo,
-        TNewInteger: PrimInt,
-        TNewInteger: HasBrand,
-        TNewInteger: HasSignIntrospection,
-        TNewInteger: MaybeHasDecode,
-        TNewInteger: MaybeHasEncode,
-        TNewInteger: MaybeHasStorageLayout,
-        TNewInteger: MaybeHasTypeInfo,
-        TEngine: IsMulDivEngine,
-        Precision<T_OLD_PRECISION>: IsCompatiblePrecision,
-        Precision<T_NEW_PRECISION>: IsCompatiblePrecision {
-    let engine_0: TEngine = engine.clone();
-    let value: TNewInteger = TNewInteger::from(value).ok_or(Error::UnsupportedConversion)?;
-    let value: Q<T_OLD_PRECISION, TNewInteger, TEngine> = new_with_custom_engine(value, engine_0);
+        Precision<A>: IsCompatiblePrecision,
+        Precision<B>: IsCompatiblePrecision {
+    debug_assert!(matches!(A, 1u8..=38u8));
+    debug_assert!(matches!(B, 1u8..=38u8));
+    let new_engine: E = engine.clone();
+    let value: D = D::from(value).ok_or(Error::UnsupportedConversion)?;
+    let value: Q<A, D, E> = new_with_custom_engine(value, new_engine);
     let algorithm: Algorithm = engine.algorithm();
     engine.cast(&value, &algorithm)
 }

@@ -30,3 +30,5 @@ mod dependency {
     #[cfg(feature = "ink")]
     pub use ink::storage::traits::StorageLayout as StorageLayoutT;
 }
+
+pub use math::Q;
