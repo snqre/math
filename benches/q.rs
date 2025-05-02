@@ -24,14 +24,14 @@ macro_rules! bench_group {
 bench_group!(
     "mul_with_bit_simulation_group",
     benchmark_mul_with_bit_simulation, {
-        let a: Q<2u8, u128> = q::<2u8, u128>(black_box(500));
-        let b_: Q<2u8, u128> = q(black_box(50u128));
+        let a: _Q<2u8, u128> = q::<2u8, u128>(black_box(500));
+        let b_: _Q<2u8, u128> = q(black_box(50u128));
         let _ = a.mul_with_bit_simulation(b_).unwrap();
     },
     "mul_with_native",
     mul_with_native, {
-        let a: Q<2u8, u128> = q::<2u8, u128>(black_box(500));
-        let b_: Q<2u8, u128> = q(black_box(50u128));
+        let a: _Q<2u8, u128> = q::<2u8, u128>(black_box(500));
+        let b_: _Q<2u8, u128> = q(black_box(50u128));
         let _ = a.mul_with_native(b_).unwrap();
     },
     "add",

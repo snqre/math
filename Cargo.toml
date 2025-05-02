@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 rand = "0.9.1"
+sealed = "0.6.0"
 [dependencies.boiler]
 version = "*"
 git = "https://github.com/snqre/boiler.git"

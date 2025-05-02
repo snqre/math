@@ -988,6 +988,7 @@ dependencies = [
  "parity-scale-codec",
  "rand 0.9.1",
  "scale-info",
+ "sealed",
  "thiserror",
 ]
 
@@ -1481,6 +1482,17 @@ dependencies = [
  "sha2",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "sealed"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22f968c5ea23d555e670b449c1c5e7b2fc399fdaec1d304a17cd48e288abc107"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
 ]
 
 [[package]]
