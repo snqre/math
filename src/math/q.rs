@@ -279,6 +279,9 @@ pub type Q6U64 = Q6<u64>;
 pub type Q7U64 = Q7<u64>;
 pub type Q8U64 = Q8<u64>;
 pub type Q9U64 = Q9<u64>;
+pub type Q10U64 = Q10<u64>;
+pub type Q11U64 = Q11<u64>;
+pub type Q12U64 = Q12<u64>;
 
 pub type Q1U128 = Q1<u128>;
 pub type Q2U128 = Q2<u128>;
@@ -339,6 +342,13 @@ pub type Q9I32 = Q9<i32>;
 
 pub type Q1I64 = Q1<i64>;
 pub type Q2I64 = Q2<i64>;
+pub type Q3I64 = Q3<i64>;
+pub type Q4I64 = Q4<i64>;
+pub type Q5I64 = Q5<i64>;
+pub type Q6I64 = Q6<i64>;
+pub type Q7I64 = Q7<i64>;
+pub type Q8I64 = Q8<i64>;
+pub type Q9I64 = Q9<i64>;
 
 pub type Q1I128 = Q1<i128>;
 pub type Q2I128 = Q2<i128>;
