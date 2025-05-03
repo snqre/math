@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 rand = "0.9.1"
+rstest = "0.25.0"
 sealed = "0.6.0"
 [dependencies.boiler]
 version = "*"
@@ -31,7 +32,7 @@ optional = true
 criterion = { version = "0.5.1" }
 
 [features]
-default = ["ink"]
+default = ["ink", "math_expansion"]
 ink = [
     "dep:ink",
     "dep:parity-scale-codec",
@@ -39,13 +40,7 @@ ink = [
 ]
 color = []
 coordinate = []
+math_expansion = []
 
 [profile.dev]
 overflow-checks = true
-
-
-# === benchmark ===
-
-[[bench]]
-name = "q"
-harness = false

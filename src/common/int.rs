@@ -1,5 +1,22 @@
-use crate::ambient::universal::Universal;
-use crate::ambient::int::Int;
+use crate::common::ink::Ink;
+use crate::common::util::Util;
+use ::num_traits::FromPrimitive;
+use ::num_traits::ToPrimitive;
+use ::num_traits::int::PrimInt;
+
+pub trait Int
+where
+    Self: Ink,
+    Self: PrimInt,
+    Self: FromPrimitive,
+    Self: ToPrimitive {}
+
+impl<T> Int for T 
+where
+    T: Ink,
+    T: PrimInt,
+    T: FromPrimitive,
+    T: ToPrimitive {}
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -15,12 +32,12 @@ pub enum Type {
     U16,
     U32,
     U64,
-    U128
+    U128,
 }
 
-pub trait Introspection 
-    where
-        Self: Int {
+pub trait Introspection
+where
+    Self: Int {
 
     fn r#type(&self) -> Type;
 
@@ -35,79 +52,83 @@ pub trait Introspection
             Type::I16 => true,
             Type::I32 => true,
             Type::I64 => true,
-            Type::I128 => true
+            Type::I128 => true,
         }
     }
-    
+
     fn is_unsigned(&self) -> bool {
         !self.is_signed()
     }
-    
-    fn as_signed<T>(&self) -> Option<T> 
-        where
-            T: Int {
+
+    fn as_signed<T>(&self) -> Option<T>
+    where
+        T: Int,
+    {
         if self.is_signed() {
             let r: T = T::from(*self).unwrap();
-            return r.into_some()
+            return r.into_some();
         }
         None
     }
-    
-    fn as_unsigned<T>(&self) -> Option<T> 
-        where
-            T: Int {
+
+    fn as_unsigned<T>(&self) -> Option<T>
+    where
+        T: Int,
+    {
         if self.is_signed() {
-            return None
+            return None;
         }
         let r: T = T::from(*self).unwrap();
         r.into_some()
     }
 
     fn to_int<T>(&self) -> Option<T>
-        where
-            T: Int {
+    where
+        T: Int,
+    {
         if Self::zero().is_signed() {
             let x: i128 = self.to_i128()?;
             let max: i128 = Self::max_value().to_i128()?;
             let min: i128 = Self::min_value().to_i128()?;
             if x > max || x < min {
-                return None
+                return None;
             }
             let x: T = T::from_i128(x)?;
-            return x.into_some()
+            return x.into_some();
         }
         let x: u128 = self.to_u128()?;
         let max: u128 = Self::max_value().to_u128()?;
         let min: u128 = Self::min_value().to_u128()?;
         if x > max || x < min {
-            return None
+            return None;
         }
         let x: T = T::from_u128(x)?;
         x.into_some()
     }
 }
 
-macro_rules! impl_block {
+macro_rules! impls {
     ($(($size:ty, $type:expr)),*) => {
         $(
-            impl Introspection for $size {
+            impl Introspection for $size 
+            where
+                Self: Int {
+
                 fn r#type(&self) -> Type {
                     $type
                 }
             }
         )*
     };
-}
-
-impl_block!(
-    (u8, Type::U8),
-    (u16, Type::U16),
-    (u32, Type::U32),
-    (u64, Type::U64),
-    (u128, Type::U128),
+} impls!(
     (i8, Type::I8),
     (i16, Type::I16),
     (i32, Type::I32),
     (i64, Type::I64),
-    (i128, Type::I128)
+    (i128, Type::I128),
+    (u8, Type::U8),
+    (u16, Type::U16),
+    (u32, Type::U32),
+    (u64, Type::U64),
+    (u128, Type::U128)
 );

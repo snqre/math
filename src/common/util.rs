@@ -1,4 +1,7 @@
-pub trait Universal: Sized {
+pub trait Util
+where
+    Self: Sized {
+
     fn into_ok<T>(self) -> Result<Self, T> {
         Ok(self)
     }
@@ -14,4 +17,4 @@ pub trait Universal: Sized {
     fn ignore(&self) {}
 }
 
-impl<T> Universal for T {}
+impl<T> Util for T {}
