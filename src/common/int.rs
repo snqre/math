@@ -1,22 +1,25 @@
-use crate::common::ink::Ink;
-use crate::common::util::Util;
-use ::num_traits::FromPrimitive;
-use ::num_traits::ToPrimitive;
-use ::num_traits::int::PrimInt;
+use crate::common::ink;
+use crate::common::util;
+use ::num_traits as num;
+
+use util::Util as _;
+use num::FromPrimitive as _;
+use num::ToPrimitive as _;
+use num::PrimInt as _;
 
 pub trait Int
 where
-    Self: Ink,
-    Self: PrimInt,
-    Self: FromPrimitive,
-    Self: ToPrimitive {}
+    Self: ink::Ink,
+    Self: num::PrimInt,
+    Self: num::FromPrimitive,
+    Self: num::ToPrimitive {}
 
 impl<T> Int for T 
 where
-    T: Ink,
-    T: PrimInt,
-    T: FromPrimitive,
-    T: ToPrimitive {}
+    T: ink::Ink,
+    T: num::PrimInt,
+    T: num::FromPrimitive,
+    T: num::ToPrimitive {}
 
 #[derive(Debug)]
 #[derive(Clone)]

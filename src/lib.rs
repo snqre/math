@@ -1,8 +1,10 @@
 #![no_std]
 #![allow(unused)]
+#![allow(unused_braces)]
+#![allow(unused_import_braces)]
 
 mod common;
-mod math;
+pub mod math;
 
 #[cfg(feature = "color")]
 mod color;

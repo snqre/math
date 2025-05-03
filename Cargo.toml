@@ -32,7 +32,7 @@ optional = true
 criterion = { version = "0.5.1" }
 
 [features]
-default = ["ink", "math_expansion"]
+default = ["ink", "custom_math"]
 ink = [
     "dep:ink",
     "dep:parity-scale-codec",
@@ -40,7 +40,8 @@ ink = [
 ]
 color = []
 coordinate = []
-math_expansion = []
+
+custom_math = []
 
 [profile.dev]
 overflow-checks = true
