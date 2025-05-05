@@ -1,5 +1,5 @@
-use crate::math::q;
-    
+use crate::num::q;
+
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct DefaultEngine;

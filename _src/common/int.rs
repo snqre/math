@@ -3,9 +3,6 @@ use crate::common::util;
 use ::num_traits as num;
 
 use util::Util as _;
-use num::FromPrimitive as _;
-use num::ToPrimitive as _;
-use num::PrimInt as _;
 
 pub trait Int
 where

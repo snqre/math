@@ -1,10 +1,9 @@
 #![no_std]
+#![deny(missing_debug_implementations)]
+#![allow(unused)]
 
-mod common;
-pub mod math;
-
-#[cfg(feature = "color")]
+mod num;
 mod color;
-
-#[cfg(feature = "coordinate")]
-mod coordinate;
+mod point_2d;
+mod point_3d;
+mod trig;
