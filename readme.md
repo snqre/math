@@ -1,7 +1,4 @@
-
-
-######
-Floats have become standard but fixed point values remain the most consistent and safe.
+Although floating-point numbers are widely used, fixed-point values offer superior consistency and safety. Fixed-point numbers do not suffer from ambiguous standards, ensuring that numeric data is reliably transferred and decoded in the correct format.
 
 ###### Symbol Legend
 | Symbol |                                           |          |
@@ -31,9 +28,8 @@ Floats have become standard but fixed point values remain the most consistent an
 | i64  | E ~9         | E ~-9         | 8    |
 | i128 | Q ~170000000 | Q ~-170000000 | 16   |
 
-
-Any missing types to 38 are non representable. Nominal values are rounded down, so the actual cap may be higher than does shown. Some variants are excluded because the
-representable range is below zero but they can still be constructed. All unsigned integers cannot be represented below zero.
+***Note***
+Types with values up to the 38th precision are representable. Representable values are rounded down, so the actual exceeds what is listed here. Types like unsigned integers cannot represent negative values.
 
 ###### U8
 | Type | Precision | Representable |
@@ -63,96 +59,96 @@ representable range is below zero but they can still be constructed. All unsigne
 | Q9U32 | 9         | ~4            |
 
 ###### U64
-| Type   | Precision | Max Representable |
-|--------|-----------|-------------------|
-| Q1U64  | 1         | E ~1              |
-| Q2U64  | 2         | P ~184            |
-| Q3U64  | 3         | P ~18             |
-| Q4U64  | 4         | P ~1              |
-| Q5U64  | 5         | T ~184            |
-| Q6U64  | 6         | T ~18             |
-| Q7U64  | 7         | T ~1              | 
-| Q8U64  | 8         | B ~184            | 
-| Q9U64  | 9         | B ~18             |
-| Q10U64 | 10        | B ~1              |
-| Q11U64 | 11        | M ~184            | 
-| Q12U64 | 12        | M ~18             | 
-| Q13U64 | 13        | M ~1              | 
-| Q14U64 | 14        | K ~184            |
-| Q15U64 | 15        | K ~18             | 
-| Q16U64 | 16        | K ~1              | 
-| Q17U64 | 17        | ~184              | 
-| Q18U64 | 18        | ~18               | 
-| Q19U64 | 19        | ~1                |
+| Type   | Precision | Representable |
+|--------|-----------|---------------|
+| Q1U64  | 1         | E ~1          |
+| Q2U64  | 2         | P ~184        |
+| Q3U64  | 3         | P ~18         |
+| Q4U64  | 4         | P ~1          |
+| Q5U64  | 5         | T ~184        |
+| Q6U64  | 6         | T ~18         |
+| Q7U64  | 7         | T ~1          | 
+| Q8U64  | 8         | B ~184        | 
+| Q9U64  | 9         | B ~18         |
+| Q10U64 | 10        | B ~1          |
+| Q11U64 | 11        | M ~184        | 
+| Q12U64 | 12        | M ~18         | 
+| Q13U64 | 13        | M ~1          | 
+| Q14U64 | 14        | K ~184        |
+| Q15U64 | 15        | K ~18         | 
+| Q16U64 | 16        | K ~1          | 
+| Q17U64 | 17        | ~184          | 
+| Q18U64 | 18        | ~18           | 
+| Q19U64 | 19        | ~1            |
 
 ###### U128
-| Type    | Precision | Max Representable |
-|---------|-----------|-------------------|
-| Q1U128  | 1         | Q ~34000000       |
-| Q2u128  | 2         | Q ~3400000        |
-| Q3U128  | 3         | Q ~340000         |
-| Q4U128  | 4         | Q ~34000          |
-| Q5U128  | 5         | Q ~3400           |
-| Q6U128  | 6         | Q ~340            |
-| Q7U128  | 7         | Q ~34             |
-| Q8U128  | 8         | Q ~3              |
-| Q9U128  | 9         | R ~340            |
-| Q10U128 | 10        | R ~34             |
-| Q11U128 | 11        | R ~3              |
-| Q12U128 | 12        | Y ~340            |
-| Q13U128 | 13        | Y ~34             |
-| Q14U128 | 14        | Y ~3              |
-| Q15U128 | 15        | Z ~340            |
-| Q16U128 | 16        | Z ~34             |
-| Q17U128 | 17        | Z ~3              |
-| Q18U128 | 18        | E ~340            |
-| Q19U128 | 19        | E ~34             |
-| Q20U128 | 20        | E ~3              |
-| Q21U128 | 21        | P ~340            | 
-| Q22U128 | 22        | P ~34             |
-| Q23U128 | 23        | P ~3              |
-| Q24U128 | 24        | T ~340            |
-| Q25U128 | 25        | T ~34             |
-| Q26U128 | 26        | T ~3              |
-| Q27U128 | 27        | B ~340            |
-| Q28U128 | 28        | B ~34             |
-| Q29U128 | 29        | B ~3              |
-| Q30U128 | 30        | M ~340            |
-| Q31U128 | 31        | M ~34             |
-| Q32U128 | 32        | M ~3              |
-| Q33U128 | 33        | K ~340            |
-| Q34U128 | 34        | K ~34             |
-| Q35U128 | 35        | K ~3              |
-| Q36U128 | 36        | ~340              |
-| Q37U128 | 37        | ~34               |
-| Q38U128 | 38        | ~3                |
+| Type    | Precision | Representable |
+|---------|-----------|---------------|
+| Q1U128  | 1         | Q ~34000000   |
+| Q2u128  | 2         | Q ~3400000    |
+| Q3U128  | 3         | Q ~340000     |
+| Q4U128  | 4         | Q ~34000      |
+| Q5U128  | 5         | Q ~3400       |
+| Q6U128  | 6         | Q ~340        |
+| Q7U128  | 7         | Q ~34         |
+| Q8U128  | 8         | Q ~3          |
+| Q9U128  | 9         | R ~340        |
+| Q10U128 | 10        | R ~34         |
+| Q11U128 | 11        | R ~3          |
+| Q12U128 | 12        | Y ~340        |
+| Q13U128 | 13        | Y ~34         |
+| Q14U128 | 14        | Y ~3          |
+| Q15U128 | 15        | Z ~340        |
+| Q16U128 | 16        | Z ~34         |
+| Q17U128 | 17        | Z ~3          |
+| Q18U128 | 18        | E ~340        |
+| Q19U128 | 19        | E ~34         |
+| Q20U128 | 20        | E ~3          |
+| Q21U128 | 21        | P ~340        | 
+| Q22U128 | 22        | P ~34         |
+| Q23U128 | 23        | P ~3          |
+| Q24U128 | 24        | T ~340        |
+| Q25U128 | 25        | T ~34         |
+| Q26U128 | 26        | T ~3          |
+| Q27U128 | 27        | B ~340        |
+| Q28U128 | 28        | B ~34         |
+| Q29U128 | 29        | B ~3          |
+| Q30U128 | 30        | M ~340        |
+| Q31U128 | 31        | M ~34         |
+| Q32U128 | 32        | M ~3          |
+| Q33U128 | 33        | K ~340        |
+| Q34U128 | 34        | K ~34         |
+| Q35U128 | 35        | K ~3          |
+| Q36U128 | 36        | ~340          |
+| Q37U128 | 37        | ~34           |
+| Q38U128 | 38        | ~3            |
 
 ###### I8
-| Type | Precision | Max Representable | Min Representable |
-|------|-----------|-------------------|-------------------|
-| Q1I8 | 1         | ~12               | ~-12              |
-| Q2I8 | 2         | ~1                | ~-1               |
+| Type | Precision | Representable |
+|------|-----------|---------------|
+| Q1I8 | 1         | ±~12          |
+| Q2I8 | 2         | ±~1           |
 
 ###### I16
-| Type  | Precision | Max Representable | Min Representable |
-|-------|-----------|-------------------|-------------------|
-| Q1I16 | 1         | K ~3              | K ~-3             |
-| Q2I16 | 2         | ~327              | ~-327             |
-| Q3I16 | 3         | ~32               | ~-32              |
-| Q4I16 | 4         | ~3                | ~-3               |
+| Type  | Precision | Representable |
+|-------|-----------|---------------|
+| Q1I16 | 1         | K ±~3         |
+| Q2I16 | 2         | ±~327         |
+| Q3I16 | 3         | ±~32          |
+| Q4I16 | 4         | ±~3           |
 
 ###### I32
-| Type  | Precision | Representable | Min Representable |
-|-------|-----------|-------------------|-------------------|
-| Q1I32 | 1         | M ±~214            | M ~-213           |
-| Q2I32 | 2         | M ±~21             | M ~-21            |
-| Q3I32 | 3         | M ±~2              | M ~-2             |
-| Q4I32 | 4         | K ±~214            | K ~-214           |
-| Q5I32 | 5         | K ±~21             | K ~-21            |
-| Q6I32 | 6         | K ±~2              | K ~-2             |
-| Q7I32 | 7         | ±~214              | ~-214             |
-| Q8I32 | 8         | ±~21               | ~-21              |
-| Q9I32 | 9         | ±~2                | ~-2               |
+| Type  | Precision | Representable |
+|-------|-----------|---------------|
+| Q1I32 | 1         | M ±~214       |
+| Q2I32 | 2         | M ±~21        |
+| Q3I32 | 3         | M ±~2         |
+| Q4I32 | 4         | K ±~214       |
+| Q5I32 | 5         | K ±~21        |
+| Q6I32 | 6         | K ±~2         |
+| Q7I32 | 7         | ±~214         |
+| Q8I32 | 8         | ±~21          |
+| Q9I32 | 9         | ±~2           |
 
 ###### I64
 | Type   | Precision | Representable |
