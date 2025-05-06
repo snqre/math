@@ -1,9 +1,65 @@
+<h1>Math</h1>
+<h2>A library..</h2>
 
-### Section
-- [Symbols](symbol_legend.md)
+<p1>
+    Although floating-point numbers are widely used, fixed-point values offer super consistency and safety. Fixed-point numbers do not suffer from ambiguous standards ensuring that numeric data is reliably transferred and decoded in the correct format.
+</p1>
 
 
-Although floating-point numbers are widely used, fixed-point values offer superior consistency and safety. Fixed-point numbers do not suffer from ambiguous standards, ensuring that numeric data is reliably transferred and decoded in the correct format.
+<h6>Symbols</h6>
+<div 
+    style="
+        display: flex;
+        border: 1px solid grey;
+        padding: 36px;
+    ">
+    <table 
+        style="
+            width: 100%;"
+        >
+        <tr>
+            <th>
+                Symbol
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>K</td>
+            <td>1,000</td>
+            <td>THOUSAND</td>
+        </tr>
+        <tr>
+            <td>M</td>
+            <td>1,000,000</td>
+            <td>MILLION</td>
+        </tr>
+        <tr>
+            <td>B</td>
+            <td>1,000,000,000</td>
+            <td>BILLION</td>
+        </tr>
+        <tr>
+            <td>T</td>
+            <td>1,000,000,000,000</td>
+            <td>TRILLION</td>
+        </tr>
+    </table>
+    <table style="width: 100%;">
+        <tr>
+            <th>Type</th>
+            <th>Range</th>
+        </tr>
+        <tr>
+            <td>u8</td>
+            <td>~255</td>
+        </tr>
+        <tr>
+            <td>u16</td>
+            <td>K ~65</td>
+        </tr>
+    </table>
+</div>
 
 
 
@@ -35,188 +91,835 @@ Although floating-point numbers are widely used, fixed-point values offer superi
 | i64  | E ~9         | E ~-9         | 8    |
 | i128 | Q ~170000000 | Q ~-170000000 | 16   |
 
-***Note***
-Types with values up to the 38th precision are representable. Representable values are rounded down, so the actual exceeds what is listed here. Types like unsigned integers cannot represent negative values.
 
-###### U8
-| Type | Precision | Representable |
-|------|-----------|---------------|
-| Q1U8 | 1         | ~25           |
-| Q2U8 | 2         | ~2            |
 
-###### U16
-| Type  | Precision | Representable |
-|-------|-----------|---------------|
-| Q1U16 | 1         | K ~6          |
-| Q2U16 | 2         | ~655          |
-| Q3U16 | 3         | ~65           |
-| Q4U16 | 4         | ~6            |
-
-###### U32
-| Type  | Precision | Representable |
-|-------|-----------|---------------|
-| Q1U32 | 1         | M ~429        |
-| Q2U32 | 2         | M ~42         |
-| Q3U32 | 3         | M ~4          |
-| Q4U32 | 4         | K ~429        |
-| Q5U32 | 5         | K ~42         |
-| Q6U32 | 6         | K ~4          |
-| Q7U32 | 7         | ~429          |
-| Q8U32 | 8         | ~42           |
-| Q9U32 | 9         | ~4            |
-
-###### U64
-| Type   | Precision | Representable |
-|--------|-----------|---------------|
-| Q1U64  | 1         | E ~1          |
-| Q2U64  | 2         | P ~184        |
-| Q3U64  | 3         | P ~18         |
-| Q4U64  | 4         | P ~1          |
-| Q5U64  | 5         | T ~184        |
-| Q6U64  | 6         | T ~18         |
-| Q7U64  | 7         | T ~1          | 
-| Q8U64  | 8         | B ~184        | 
-| Q9U64  | 9         | B ~18         |
-| Q10U64 | 10        | B ~1          |
-| Q11U64 | 11        | M ~184        | 
-| Q12U64 | 12        | M ~18         | 
-| Q13U64 | 13        | M ~1          | 
-| Q14U64 | 14        | K ~184        |
-| Q15U64 | 15        | K ~18         | 
-| Q16U64 | 16        | K ~1          | 
-| Q17U64 | 17        | ~184          | 
-| Q18U64 | 18        | ~18           | 
-| Q19U64 | 19        | ~1            |
-
-###### U128
-| Type    | Precision | Representable |
-|---------|-----------|---------------|
-| Q1U128  | 1         | Q ~34000000   |
-| Q2u128  | 2         | Q ~3400000    |
-| Q3U128  | 3         | Q ~340000     |
-| Q4U128  | 4         | Q ~34000      |
-| Q5U128  | 5         | Q ~3400       |
-| Q6U128  | 6         | Q ~340        |
-| Q7U128  | 7         | Q ~34         |
-| Q8U128  | 8         | Q ~3          |
-| Q9U128  | 9         | R ~340        |
-| Q10U128 | 10        | R ~34         |
-| Q11U128 | 11        | R ~3          |
-| Q12U128 | 12        | Y ~340        |
-| Q13U128 | 13        | Y ~34         |
-| Q14U128 | 14        | Y ~3          |
-| Q15U128 | 15        | Z ~340        |
-| Q16U128 | 16        | Z ~34         |
-| Q17U128 | 17        | Z ~3          |
-| Q18U128 | 18        | E ~340        |
-| Q19U128 | 19        | E ~34         |
-| Q20U128 | 20        | E ~3          |
-| Q21U128 | 21        | P ~340        | 
-| Q22U128 | 22        | P ~34         |
-| Q23U128 | 23        | P ~3          |
-| Q24U128 | 24        | T ~340        |
-| Q25U128 | 25        | T ~34         |
-| Q26U128 | 26        | T ~3          |
-| Q27U128 | 27        | B ~340        |
-| Q28U128 | 28        | B ~34         |
-| Q29U128 | 29        | B ~3          |
-| Q30U128 | 30        | M ~340        |
-| Q31U128 | 31        | M ~34         |
-| Q32U128 | 32        | M ~3          |
-| Q33U128 | 33        | K ~340        |
-| Q34U128 | 34        | K ~34         |
-| Q35U128 | 35        | K ~3          |
-| Q36U128 | 36        | ~340          |
-| Q37U128 | 37        | ~34           |
-| Q38U128 | 38        | ~3            |
-
-###### I8
-| Type | Precision | Representable |
-|------|-----------|---------------|
-| Q1I8 | 1         | ±~12          |
-| Q2I8 | 2         | ±~1           |
-
-###### I16
-| Type  | Precision | Representable |
-|-------|-----------|---------------|
-| Q1I16 | 1         | K ±~3         |
-| Q2I16 | 2         | ±~327         |
-| Q3I16 | 3         | ±~32          |
-| Q4I16 | 4         | ±~3           |
-
-###### I32
-| Type  | Precision | Representable |
-|-------|-----------|---------------|
-| Q1I32 | 1         | M ±~214       |
-| Q2I32 | 2         | M ±~21        |
-| Q3I32 | 3         | M ±~2         |
-| Q4I32 | 4         | K ±~214       |
-| Q5I32 | 5         | K ±~21        |
-| Q6I32 | 6         | K ±~2         |
-| Q7I32 | 7         | ±~214         |
-| Q8I32 | 8         | ±~21          |
-| Q9I32 | 9         | ±~2           |
-
-###### I64
-| Type   | Precision | Representable |
-|--------|-----------|---------------|
-| Q1I64  | 1         | P ±~922       |
-| Q2I64  | 2         | P ±~92        |
-| Q3I64  | 3         | P ±~9         | 
-| Q4I64  | 4         | T ±~922       | 
-| Q5I64  | 5         | T ±~92        | 
-| Q6I64  | 6         | T ±~9         | 
-| Q7I64  | 7         | B ±~922       | 
-| Q8I64  | 8         | B ±~92        | 
-| Q9I64  | 9         | B ±~9         | 
-| Q10I64 | 10        | M ±~922       | 
-| Q11I64 | 11        | M ±~92        | 
-| Q12I64 | 12        | M ±~9         |
-| Q13I64 | 13        | K ±~922       | 
-| Q14I64 | 14        | K ±~92        | 
-| Q15I64 | 15        | K ±~9         |
-| Q16I64 | 16        | ±~922         |
-| Q17I64 | 17        | ±~92          |
-| Q18I64 | 18        | ±~9           |
-
-###### I128
-| Type    | Precision | Representable |
-|---------|-----------|---------------|
-| Q1I128  | 1         | Q ±~17000000  |
-| Q2I128  | 2         | Q ±~1700000   |
-| Q3I128  | 3         | Q ±~170000    |
-| Q4I128  | 4         | Q ±~17000     |
-| Q5I128  | 5         | Q ±~1700      |
-| Q6I128  | 6         | Q ±~170       |
-| Q7I128  | 7         | Q ±~17        |
-| Q8I128  | 8         | Q ±~1         |
-| Q9I128  | 9         | R ±~170       |
-| Q10I128 | 10        | R ±~17        |
-| Q11I128 | 11        | R ±~1         |
-| Q12I128 | 12        | Y ±~170       |
-| Q13I128 | 13        | Y ±~17        |
-| Q14I128 | 14        | Y ±~1         |
-| Q15I128 | 15        | Z ±~170       |
-| Q16I128 | 16        | Z ±~17        |
-| Q17I128 | 17        | Z ±~1         |
-| Q18I128 | 18        | E ±~170       |
-| Q19I128 | 19        | E ±~17        | 
-| Q20I128 | 20        | E ±~1         |
-| Q21I128 | 21        | P ±~170       |
-| Q22I128 | 22        | P ±~17        |
-| Q23I128 | 23        | P ±~1         | 
-| Q24I128 | 24        | T ±~170       | 
-| Q25I128 | 25        | T ±~17        |
-| Q26I128 | 26        | T ±~1         |
-| Q27I128 | 27        | B ±~170       |
-| Q28I128 | 28        | B ±~17        |
-| Q29I128 | 29        | B ±~1         |
-| Q30I128 | 30        | M ±~170       | 
-| Q31I128 | 31        | M ±~17        |
-| Q32I128 | 32        | M ±~1         |
-| Q33I128 | 33        | K ±~170       |
-| Q34I128 | 34        | K ±~17        | 
-| Q35I128 | 35        | K ±~1         | 
-| Q36I128 | 36        | ±~170         | 
-| Q37I128 | 37        | ±~17          |
-| Q38I128 | 38        | ±~1           |
+<h5>Q Variant Sheet</h5>
+<p2>
+    Types with values up to the 38th precision are representable. Representable values are rounded down, so the actual value exceeds what is listed here. Types like unsigned integers cannot represent negative values.
+</p2>
+<div
+    style="
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+        align-items: start;
+        gap: 50px; 
+        min-width: 100%;
+    ">
+    <div>
+        <h6>U8</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1U8</td>
+                <td>1</td>
+                <td>~25</td>
+            </tr>
+            <tr>
+                <td>Q2U8</td>
+                <td>2</td>
+                <td>~2</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>U16</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1U16</td>
+                <td>1</td>
+                <td>K ~6</td>
+            </tr>
+            <tr>
+                <td>Q2U16</td>
+                <td>2</td>
+                <td>~655</td>
+            </tr>
+            <tr>
+                <td>Q3U16</td>
+                <td>3</td>
+                <td>~65</td>
+            </tr>
+            <tr>
+                <td>Q4U16</td>
+                <td>4</td>
+                <td>~6</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>U32</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1U32</td>
+                <td>1</td>
+                <td>M ~429</td>
+            </tr>
+            <tr>
+                <td>Q2U32</td>
+                <td>2</td>
+                <td>M ~42</td>
+            </tr>
+            <tr>
+                <td>Q3U32</td>
+                <td>3</td>
+                <td>M ~3</td>
+            </tr>
+            <tr>
+                <td>Q4U32</td>
+                <td>4</td>
+                <td>K ~429</td>
+            </tr>
+            <tr>
+                <td>Q5U32</td>
+                <td>5</td>
+                <td>K ~42</td>
+            </tr>
+            <tr>
+                <td>Q6U32</td>
+                <td>6</td>
+                <td>K ~4</td>
+            </tr>
+            <tr>
+                <td>Q7U32</td>
+                <td>7</td>
+                <td>~429</td>
+            </tr>
+            <tr>
+                <td>Q8U32</td>
+                <td>8</td>
+                <td>~42</td>
+            </tr>
+            <tr>
+                <td>Q9U32</td>
+                <td>7</td>
+                <td>~4</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>U64</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1U64</td>
+                <td>1</td>
+                <td>E ~1</td>
+            </tr>
+            <tr>
+                <td>Q2U64</td>
+                <td>2</td>
+                <td>P ~184</td>
+            </tr>
+            <tr>
+                <td>Q3U64</td>
+                <td>3</td>
+                <td>P ~18</td>
+            </tr>
+            <tr>
+                <td>Q4U64</td>
+                <td>4</td>
+                <td>P ~1</td>
+            </tr>
+            <tr>
+                <td>Q5U64</td>
+                <td>5</td>
+                <td>T ~184</td>
+            </tr>
+            <tr>
+                <td>Q6U64</td>
+                <td>6</td>
+                <td>T ~18</td>
+            </tr>
+            <tr>
+                <td>Q7U64</td>
+                <td>7</td>
+                <td>T ~1</td>
+            </tr>
+            <tr>
+                <td>Q8U64</td>
+                <td>8</td>
+                <td>B ~184</td>
+            </tr>
+            <tr>
+                <td>Q9U64</td>
+                <td>9</td>
+                <td>B ~18</td>
+            </tr>
+            <tr>
+                <td>Q10U64</td>
+                <td>10</td>
+                <td>B ~1</td>
+            </tr>
+            <tr>
+                <td>Q11U64</td>
+                <td>11</td>
+                <td>M ~184</td>
+            </tr>
+            <tr>
+                <td>Q12U64</td>
+                <td>12</td>
+                <td>M ~18</td>
+            </tr>
+            <tr>
+                <td>Q13U64</td>
+                <td>13</td>
+                <td>M ~1</td>
+            </tr>
+            <tr>
+                <td>Q14U64</td>
+                <td>14</td>
+                <td>K ~184</td>
+            </tr>
+            <tr>
+                <td>Q15U64</td>
+                <td>15</td>
+                <td>K ~18</td>
+            </tr>
+            <tr>
+                <td>Q16U64</td>
+                <td>16</td>
+                <td>K ~1</td>
+            </tr>
+            <tr>
+                <td>Q17U64</td>
+                <td>17</td>
+                <td>~184</td>
+            </tr>
+            <tr>
+                <td>Q18U64</td>
+                <td>18</td>
+                <td>~18</td>
+            </tr>
+            <tr>
+                <td>Q19U64</td>
+                <td>19</td>
+                <td>~1</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>U128</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1U128</td>
+                <td>1</td>
+                <td>Q ~34000000</td>
+            </tr>
+            <tr>
+                <td>Q2U128</td>
+                <td>2</td>
+                <td>Q ~3400000</td>
+            </tr>
+            <tr>
+                <td>Q3U128</td>
+                <td>3</td>
+                <td>Q ~340000</td>
+            </tr>
+            <tr>
+                <td>Q4U128</td>
+                <td>4</td>
+                <td>Q ~34000</td>
+            </tr>
+            <tr>
+                <td>Q5U128</td>
+                <td>5</td>
+                <td>Q ~3400</td>
+            </tr>
+            <tr>
+                <td>Q6U128</td>
+                <td>6</td>
+                <td>Q ~340</td>
+            </tr>
+            <tr>
+                <td>Q7U128</td>
+                <td>7</td>
+                <td>Q ~34</td>
+            </tr>
+            <tr>
+                <td>Q8U128</td>
+                <td>8</td>
+                <td>Q ~3</td>
+            </tr>
+            <tr>
+                <td>Q9U128</td>
+                <td>9</td>
+                <td>R ~340</td>
+            </tr>
+            <tr>
+                <td>Q10U128</td>
+                <td>10</td>
+                <td>R ~32</td>
+            </tr>
+            <tr>
+                <td>Q11U128</td>
+                <td>11</td>
+                <td>R ~3</td>
+            </tr>
+            <tr>
+                <td>Q12U128</td>
+                <td>12</td>
+                <td>Y ~340</td>
+            </tr>
+            <tr>
+                <td>Q13U128</td>
+                <td>13</td>
+                <td>Y ~34</td>
+            </tr>
+            <tr>
+                <td>Q14U128</td>
+                <td>14</td>
+                <td>Y ~3</td>
+            </tr>
+            <tr>
+                <td>Q15U128</td>
+                <td>15</td>
+                <td>Z ~340</td>
+            </tr>
+            <tr>
+                <td>Q16U128</td>
+                <td>16</td>
+                <td>Z ~34</td>
+            </tr>
+            <tr>
+                <td>Q17U128</td>
+                <td>17</td>
+                <td>Z ~3</td>
+            </tr>
+            <tr>
+                <td>Q18U128</td>
+                <td>18</td>
+                <td>E ~340</td>
+            </tr>
+            <tr>
+                <td>Q19U128</td>
+                <td>19</td>
+                <td>E ~34</td>
+            </tr>
+            <tr>
+                <td>Q20U128</td>
+                <td>20</td>
+                <td>E ~3</td>
+            </tr>
+            <tr>
+                <td>Q21U128</td>
+                <td>21</td>
+                <td>P ~340</td>
+            </tr>
+            <tr>
+                <td>Q22U128</td>
+                <td>22</td>
+                <td>P ~34</td>
+            </tr>
+            <tr>
+                <td>Q23U128</td>
+                <td>23</td>
+                <td>P ~3</td>
+            </tr>
+            <tr>
+                <td>Q24U128</td>
+                <td>24</td>
+                <td>T ~340</td>
+            </tr>
+            <tr>
+                <td>Q25U128</td>
+                <td>25</td>
+                <td>T ~34</td>
+            </tr>
+            <tr>
+                <td>Q26U128</td>
+                <td>26</td>
+                <td>T ~3</td>
+            </tr>
+            <tr>
+                <td>Q27U128</td>
+                <td>27</td>
+                <td>B ~340</td>
+            </tr>
+            <tr>
+                <td>Q28U128</td>
+                <td>28</td>
+                <td>B ~34</td>
+            </tr>
+            <tr>
+                <td>Q29U128</td>
+                <td>29</td>
+                <td>B ~3</td>
+            </tr>
+            <tr>
+                <td>Q30U128</td>
+                <td>30</td>
+                <td>M ~340</td>
+            </tr>
+            <tr>
+                <td>Q31U128</td>
+                <td>31</td>
+                <td>M ~34</td>
+            </tr>
+            <tr>
+                <td>Q32U128</td>
+                <td>32</td>
+                <td>M ~3</td>
+            </tr>
+            <tr>
+                <td>Q33U128</td>
+                <td>33</td>
+                <td>K ~340</td>
+            </tr>
+            <tr>
+                <td>Q34U128</td>
+                <td>34</td>
+                <td>K ~34</td>
+            </tr>
+            <tr>
+                <td>Q35U128</td>
+                <td>35</td>
+                <td>K ~3</td>
+            </tr>
+            <tr>
+                <td>Q36U128</td>
+                <td>36</td>
+                <td>~340</td>
+            </tr>
+            <tr>
+                <td>Q37U128</td>
+                <td>37</td>
+                <td>~34</td>
+            </tr>
+            <tr>
+                <td>Q38U128</td>
+                <td>38</td>
+                <td>~3</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>I8</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1I8</td>
+                <td>1</td>
+                <td>±~12</td>
+            </tr>
+            <tr>
+                <td>Q2I8</td>
+                <td>2</td>
+                <td>±~1</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>I16</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1I16</td>
+                <td>1</td>
+                <td>K ±~3</td>
+            </tr>
+            <tr>
+                <td>Q2I16</td>
+                <td>2</td>
+                <td>±~327</td>
+            </tr>
+            <tr>
+                <td>Q3I16</td>
+                <td>3</td>
+                <td>±~32</td>
+            </tr>
+            <tr>
+                <td>Q4I16</td>
+                <td>4</td>
+                <td>±~3</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>I32</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1I32</td>
+                <td>1</td>
+                <td>M ±~214</td>
+            </tr>
+            <tr>
+                <td>Q2I32</td>
+                <td>2</td>
+                <td>M ±~21</td>
+            </tr>
+            <tr>
+                <td>Q3I32</td>
+                <td>3</td>
+                <td>M ±~2</td>
+            </tr>
+            <tr>
+                <td>Q4I32</td>
+                <td>4</td>
+                <td>K ±~214</td>
+            </tr>
+            <tr>
+                <td>Q5I32</td>
+                <td>5</td>
+                <td>K ±~21</td>
+            </tr>
+            <tr>
+                <td>Q6I32</td>
+                <td>6</td>
+                <td>K ±~2</td>
+            </tr>
+            <tr>
+                <td>Q7I32</td>
+                <td>7</td>
+                <td>±~214</td>
+            </tr>
+            <tr>
+                <td>Q8I32</td>
+                <td>8</td>
+                <td>±~21</td>
+            </tr>
+            <tr>
+                <td>Q9I32</td>
+                <td>9</td>
+                <td>±~2</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>I64</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1I64</td>
+                <td>1</td>
+                <td>P ±~922</td>
+            </tr>
+            <tr>
+                <td>Q2I64</td>
+                <td>2</td>
+                <td>P ±~92</td>
+            </tr>
+            <tr>
+                <td>Q3I64</td>
+                <td>3</td>
+                <td>P ±~9</td>
+            </tr>
+            <tr>
+                <td>Q4I64</td>
+                <td>4</td>
+                <td>T ±~922</td>
+            </tr>
+            <tr>
+                <td>Q5I64</td>
+                <td>5</td>
+                <td>T ±~92</td>
+            </tr>
+            <tr>
+                <td>Q6I64</td>
+                <td>6</td>
+                <td>T ±~9</td>
+            </tr>
+            <tr>
+                <td>Q7I64</td>
+                <td>7</td>
+                <td>B ±~922</td>
+            </tr>
+            <tr>
+                <td>Q8I64</td>
+                <td>8</td>
+                <td>B ±~92</td>
+            </tr>
+            <tr>
+                <td>Q9I64</td>
+                <td>9</td>
+                <td>B ±~9</td>
+            </tr>
+            <tr>
+                <td>Q10I64</td>
+                <td>10</td>
+                <td>M ±~922</td>
+            </tr>
+            <tr>
+                <td>Q11I64</td>
+                <td>11</td>
+                <td>M ±~92</td>
+            </tr>
+            <tr>
+                <td>Q12I64</td>
+                <td>12</td>
+                <td>M ±~9</td>
+            </tr>
+            <tr>
+                <td>Q13I64</td>
+                <td>13</td>
+                <td>K ±~922</td>
+            </tr>
+            <tr>
+                <td>Q14I64</td>
+                <td>14</td>
+                <td>K ±~92</td>
+            </tr>
+            <tr>
+                <td>Q15I64</td>
+                <td>15</td>
+                <td>K ±~9</td>
+            </tr>
+            <tr>
+                <td>Q16I64</td>
+                <td>16</td>
+                <td>±~922</td>
+            </tr>
+            <tr>
+                <td>Q17I64</td>
+                <td>17</td>
+                <td>±~92</td>
+            </tr>
+            <tr>
+                <td>Q18I64</td>
+                <td>18</td>
+                <td>±~9</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h6>I128</h6>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Precision</th>
+                <th>Representable</th>
+            </tr>
+            <tr>
+                <td>Q1I128</td>
+                <td>1</td>
+                <td>Q ±~17000000</td>
+            </tr>
+            <tr>
+                <td>Q2I128</td>
+                <td>2</td>
+                <td>Q ±~1700000</td>
+            </tr>
+            <tr>
+                <td>Q3I128</td>
+                <td>3</td>
+                <td>Q ±~170000</td>
+            </tr>
+            <tr>
+                <td>Q4I128</td>
+                <td>4</td>
+                <td>Q ±~17000</td>
+            </tr>
+            <tr>
+                <td>Q5I128</td>
+                <td>5</td>
+                <td>Q ±~1700</td>
+            </tr>
+            <tr>
+                <td>Q6I128</td>
+                <td>6</td>
+                <td>Q ±~170</td>
+            </tr>
+            <tr>
+                <td>Q7I128</td>
+                <td>7</td>
+                <td>Q ±~17</td>
+            </tr>
+            <tr>
+                <td>Q8I128</td>
+                <td>8</td>
+                <td>Q ±~1</td>
+            </tr>
+            <tr>
+                <td>Q9I128</td>
+                <td>9</td>
+                <td>R ±~170</td>
+            </tr>
+            <tr>
+                <td>Q10I128</td>
+                <td>10</td>
+                <td>R ±~17</td>
+            </tr>
+            <tr>
+                <td>Q11I128</td>
+                <td>11</td>
+                <td>R ±~1</td>
+            </tr>
+            <tr>
+                <td>Q12I128</td>
+                <td>12</td>
+                <td>Y ±~170</td>
+            </tr>
+            <tr>
+                <td>Q13I128</td>
+                <td>13</td>
+                <td>Y ±~17</td>
+            </tr>
+            <tr>
+                <td>Q14I128</td>
+                <td>14</td>
+                <td>Y ±~1</td>
+            </tr>
+            <tr>
+                <td>Q15I128</td>
+                <td>15</td>
+                <td>Z ±~170</td>
+            </tr>
+            <tr>
+                <td>Q16I128</td>
+                <td>16</td>
+                <td>Z ±~17</td>
+            </tr>
+            <tr>
+                <td>Q17I128</td>
+                <td>17</td>
+                <td>Z ±~1</td>
+            </tr>
+            <tr>
+                <td>Q18I128</td>
+                <td>18</td>
+                <td>E ±~170</td>
+            </tr>
+            <tr>
+                <td>Q19I128</td>
+                <td>19</td>
+                <td>E ±~17</td>
+            </tr>
+            <tr>
+                <td>Q20I128</td>
+                <td>20</td>
+                <td>E ±~1</td>
+            </tr>
+            <tr>
+                <td>Q21I128</td>
+                <td>21</td>
+                <td>P ±~170</td>
+            </tr>
+            <tr>
+                <td>Q22I128</td>
+                <td>22</td>
+                <td>P ±~17</td>
+            </tr>
+            <tr>
+                <td>Q23I128</td>
+                <td>23</td>
+                <td>P ±~1</td>
+            </tr>
+            <tr>
+                <td>Q24I128</td>
+                <td>24</td>
+                <td>T ±~170</td>
+            </tr>
+            <tr>
+                <td>Q25I128</td>
+                <td>25</td>
+                <td>T ±~17</td>
+            </tr>
+            <tr>
+                <td>Q26I128</td>
+                <td>26</td>
+                <td>T ±~1</td>
+            </tr>
+            <tr>
+                <td>Q27I128</td>
+                <td>27</td>
+                <td>B ±~170</td>
+            </tr>
+            <tr>
+                <td>Q28I128</td>
+                <td>28</td>
+                <td>B ±~17</td>
+            </tr>
+            <tr>
+                <td>Q29I128</td>
+                <td>29</td>
+                <td>B ±~1</td>
+            </tr>
+            <tr>
+                <td>Q30I128</td>
+                <td>30</td>
+                <td>M ±~170</td>
+            </tr>
+            <tr>
+                <td>Q31I128</td>
+                <td>31</td>
+                <td>M ±~17</td>
+            </tr>
+            <tr>
+                <td>Q32I128</td>
+                <td>32</td>
+                <td>M ±~1</td>
+            </tr>
+            <tr>
+                <td>Q33I128</td>
+                <td>33</td>
+                <td>K ±~170</td>
+            </tr>
+            <tr>
+                <td>Q34I128</td>
+                <td>34</td>
+                <td>K ±~17</td>
+            </tr>
+            <tr>
+                <td>Q35I128</td>
+                <td>35</td>
+                <td>K ±~1</td>
+            </tr>
+            <tr>
+                <td>Q36I128</td>
+                <td>36</td>
+                <td>±~170</td>
+            </tr>
+            <tr>
+                <td>Q37I128</td>
+                <td>37</td>
+                <td>±~17</td>
+            </tr>
+            <tr>
+                <td>Q38I128</td>
+                <td>38</td>
+                <td>±~1</td>
+            </tr>
+        </table>
+    </div>    
+</div>

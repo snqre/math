@@ -65,7 +65,7 @@ where
     B: int::Int,
     B: int_introspection::IntIntrospection, 
     precision::Precision<A>: precision::Compatible {
-    let zero: &B = &B::zero();
+    let zero: B = B::zero();
     let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     let z: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
