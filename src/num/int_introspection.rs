@@ -1,5 +1,4 @@
 use crate::num::int;
-
 use ::num_traits as num;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
@@ -7,10 +6,14 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(::thiserror::Error)]
 #[repr(u8)]
 pub enum Error {
+    #[error("")]
     UnsupportedConversion,
+    #[error("")]
     ConversionOverflow,
+    #[error("")]
     ConversionUnderflow
 }
 

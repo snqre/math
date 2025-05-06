@@ -2,7 +2,7 @@ use crate::num::int;
 use crate::num::int_introspection;
 use crate::num::precision;
 use crate::num::q;
-use crate::num::default_engine;
+use crate::num::engine::default_engine;
 
 pub type Point3DQ1U8 = Point3DQ1<u8>;
 pub type Point3DQ2U8 = Point3DQ2<u8>;
@@ -34,13 +34,11 @@ pub enum Error {
     Q(#[from] q::Error)
 }
 
-#[derive(Debug)]
 #[derive(Clone)]
 pub struct Point3D<const A: u8, B, C> where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: q::Engine, 
-    precision::Precision<A>: precision::Compatible {
+    C: q::Engine, precision::Precision<A>: precision::Compatible {
     _x: q::Q<A, B, C>,
     _y: q::Q<A, B, C>,
     _z: q::Q<A, B, C>
@@ -54,8 +52,7 @@ pub fn new<const A: u8, B, C>(
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: q::Engine, 
-    precision::Precision<A>: precision::Compatible {
+    C: q::Engine, precision::Precision<A>: precision::Compatible {
     Point3D {
         _x: x.clone(),
         _y: y.clone(),
@@ -66,11 +63,12 @@ where
 pub fn default<const A: u8, B>() -> Point3D<A, B, default_engine::DefaultEngine> 
 where
     B: int::Int,
-    B: int_introspection::IntIntrospection,
+    B: int_introspection::IntIntrospection, 
     precision::Precision<A>: precision::Compatible {
-    let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(0 as u8);
-    let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(0 as u8);
-    let z: q::Q<A, B, default_engine::DefaultEngine> = q::new(0 as u8);
+    let zero: &B = &B::zero();
+    let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
+    let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
+    let z: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     Point3D {
         _x: x,
         _y: y,
@@ -82,22 +80,16 @@ impl<const A: u8, B, C> Point3D<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: q::Engine,
+    C: q::Engine, 
     precision::Precision<A>: precision::Compatible {
     
     pub fn distance_between(&self, rhs: &Self) -> Result<q::Q<A, B, C>> {
-        let x_0: &q::Q<A, B, C> = &self._x;
-        let y_0: &q::Q<A, B, C> = &self._y;
-        let z_0: &q::Q<A, B, C> = &self._z;
-        let x_1: &q::Q<A, B, C> = &rhs._x;
-        let y_1: &q::Q<A, B, C> = &rhs._y;
-        let z_1: &q::Q<A, B, C> = &rhs._z;
-        let dx: &q::Q<A, B, C> = &(x_0 - x_1)?;
-        let dx: &q::Q<A, B, C> = &(dx * dx)?;
-        let dy: &q::Q<A, B, C> = &(y_0 - y_1)?;
-        let dy: &q::Q<A, B, C> = &(dy * dy)?;
-        let dz: &q::Q<A, B, C> = &(z_0 - z_1)?;
-        let dz: &q::Q<A, B, C> = &(dz * dz)?;
+        let dx: q::Q<A, B, C> = (self._x - rhs._x)?;
+        let dx: q::Q<A, B, C> = (dx * dx)?;
+        let dy: q::Q<A, B, C> = (self._y - rhs._y)?;
+        let dy: q::Q<A, B, C> = (dy * dy)?;
+        let dz: q::Q<A, B, C> = (self._z - rhs._z)?;
+        let dz: q::Q<A, B, C> = (dz * dz)?;
         let sum = ((dx + dy)? + dz)?.sqrt()?;
         Ok(sum)
     }

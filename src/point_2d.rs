@@ -1,4 +1,4 @@
-use crate::num::default_engine;
+use crate::num::engine::default_engine;
 use crate::num::int;
 use crate::num::int_introspection;
 use crate::num::precision;
@@ -48,8 +48,9 @@ where
     B: int::Int,
     B: int_introspection::IntIntrospection,
     precision::Precision<A>: precision::Compatible {
-    let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(&B::zero());
-    let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(&B::zero());
+    let zero: &B = &B::zero();
+    let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
+    let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     Point2D {
         _x: x,
         _y: y

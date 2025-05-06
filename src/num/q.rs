@@ -2,12 +2,14 @@ use crate::num::int::{self, Int as _};
 use crate::num::int_introspection::{self, IntIntrospection as _};
 use crate::num::precision;
 use crate::num::engine::default_engine;
-use core::ops;
-
+use ::core::ops;
+use ::core::cmp;
+use ::num_traits::{self as num, ToPrimitive as _};
 pub trait Engine 
 where
     Self: Sized,
-    Self: Clone {
+    Self: Clone,
+    Self: Copy {
 
     fn sqrt<const A: u8, B>(&self, x: &Q<A, B, Self>) -> Result<Q<A, B, Self>> 
     where 
@@ -15,8 +17,8 @@ where
         B: int_introspection::IntIntrospection,
         precision::Precision<A>: precision::Compatible {
         use Error::*;
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let scale: u128 = precision::u128_scale::<A>();
         let x: B = x._v;
         if x.is_signed() {
@@ -47,8 +49,8 @@ where
         C: int_introspection::IntIntrospection,
         precision::Precision<A>: precision::Compatible,
         precision::Precision<B>: precision::Compatible {
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let x: C = x._v;
         if A == B {
             let result: C = x;
@@ -61,7 +63,7 @@ where
             let result: i128 = x.to_i128().unwrap();
             let result: i128 = self.muldiv(&result, &new_scale, &old_scale)?;
             let result: C = C::from(result).unwrap();
-            let result: Q<B, C, Self> = Q::new_with_custom_engine(&result, self);
+            let result: Q<B, C, Self> = new_with_custom_engine(&result, self);
             return Ok(result)
         }
         let old_scale: u128 = precision::u128_scale::<A>();
@@ -69,17 +71,20 @@ where
         let result: u128 = x.to_u128().unwrap();
         let result: u128 = self.muldiv(&result, &new_scale, &old_scale)?;
         let result: C = C::from(result).unwrap();
-        let result: Q<B, C, Self> = Q::new_with_custom_engine(&result, self);
+        let result: Q<B, C, Self> = new_with_custom_engine(&result, self);
         Ok(result)
     }
 
-    fn mul<const A: u8, B>(&self, x: &Q<A, B, Self>, y: &Q<A, B, Self>) -> Result<Q<A, B, Self>> 
+    fn mul<const A: u8, B>(
+        &self, 
+        x: &Q<A, B, Self>, 
+        y: &Q<A, B, Self>) -> Result<Q<A, B, Self>> 
     where     
         B: int::Int,
         B: int_introspection::IntIntrospection,
         precision::Precision<A>: precision::Compatible {
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let x: B = x._v;
         let y: B = y._v;
         let precision: u32 = A.into();
@@ -97,7 +102,7 @@ where
         let scale: u128 = precision::u128_scale::<A>();
         let result: u128 = self.muldiv(&x, &y, &scale)?;
         let result: B = B::from(result).unwrap();
-        let result: Q<A, B, Self> = Q::new_with_custom_engine(&result, self);
+        let result: Q<A, B, Self> = new_with_custom_engine(&result, self);
         Ok(result)
     }
 
@@ -109,11 +114,11 @@ where
         B: int::Int,
         B: int_introspection::IntIntrospection,
         precision::Precision<A>: precision::Compatible {
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let x: &B = &x._v;
         let y: &B = &y._v;
-        let scale: u128 = precision::Precision::<A>::u128_scale();
+        let scale: u128 = precision::u128_scale::<A>();
         if x.is_signed() {
             let x: i128 = x.to_i128().unwrap();
             let y: i128 = y.to_i128().unwrap();
@@ -121,13 +126,13 @@ where
                 let z: u32 = scale.trailing_zeros();
                 let result: i128 = (x << z).checked_div(y).ok_or(Error::DivisionByZero)?;
                 let result: &B = &B::from(result).unwrap();
-                let result: Q<A, B, Self> = Q::new_with_custom_engine(result, self);
+                let result: Q<A, B, Self> = new_with_custom_engine(result, self);
                 return Ok(result)
             }
             let scale: i128 = precision::i128_scale::<A>();
             let result: i128 = self.muldiv(&x, &scale, &y)?;
             let result: B = B::from(result).unwrap();
-            let result: Q<A, B, Self> = Q::new_with_custom_engine(&result, self);
+            let result: Q<A, B, Self> = new_with_custom_engine(&result, self);
             return Ok(result)
         }
         let x: u128 = x.to_u128().unwrap();
@@ -136,12 +141,12 @@ where
             let z: u32 = scale.trailing_zeros();
             let result: u128 = (x << z).checked_div(y).ok_or(Error::DivisionByZero)?;
             let result: B = B::from(result).unwrap();
-            let result: Q<A, B, Self> = Q::new_with_custom_engine(&result, self);
+            let result: Q<A, B, Self> = new_with_custom_engine(&result, self);
             return Ok(result)
         }
         let result: u128 = self.muldiv(&x, &scale, &y)?;
         let result: B = B::from(result).unwrap();
-        let result: Q<A, B, Self> = Q::new_with_custom_engine(&result, self);
+        let result: Q<A, B, Self> = new_with_custom_engine(&result, self);
         Ok(result)
     }
 
@@ -175,11 +180,10 @@ where
                         .to_i128()
                         .ok_or(Error::UnsupportedConversion)?
                         .wrapping_neg()
-                        .to_int()
-                        .ok_or(Error::UnsupportedConversion)?;
+                        .to_int()?;
                     return Ok(result)
                 }
-                let result: T = result.to_int().ok_or(Error::UnsupportedConversion)?;
+                let result: T = result.to_int()?;
                 return Ok(result)
             }
             let result: u128 = _fold_128_bit_product_mod(a, b, z) / z;
@@ -188,11 +192,10 @@ where
                     .to_i128()
                     .ok_or(Error::UnsupportedConversion)?
                     .wrapping_neg()
-                    .to_int()
-                    .ok_or(Error::UnsupportedConversion)?;
+                    .to_int()?;
                 return Ok(result)
             }
-            let result: T = result.to_int().ok_or(Error::UnsupportedConversion)?;
+            let result: T = result.to_int()?;
             return Ok(result)
         }
         let x: u128 = x.to_u128().unwrap();
@@ -204,11 +207,11 @@ where
         }
         if b == 0 {
             let result: u128 = a / z;
-            let result: T = result.to_int().ok_or(Error::UnsupportedConversion)?;
+            let result: T = result.to_int()?;
             return Ok(result);
         }
         let result: u128 = _fold_128_bit_product_mod(a, b, z) / z;
-        let result: T = result.to_int().ok_or(Error::UnsupportedConversion)?;
+        let result: T = result.to_int()?;
         Ok(result)
     }
 }
@@ -255,6 +258,8 @@ pub type Result<T> = ::core::result::Result<T, Error>;
 #[derive(PartialEq)]
 #[derive(thiserror::Error)]
 pub enum Error {
+    #[error("")]
+    IntIntrospection(#[from] int_introspection::Error),
     #[error("This value is above the representable range for this type.")]
     Overflow,
     #[error("This value is above the representable range for the type it is being converted to.")]
@@ -302,10 +307,16 @@ where
     Q { _v: *value, _engine: engine.clone() }
 }
 
-
-
-
-
+impl<const A: u8, B, C> Q<A, B, C>
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+    
+    pub fn sqrt(&self) -> Result<Self> {
+        self._engine.sqrt(self)
+    }
+}
 
 impl<const A: u8, B, C> ops::Add for Q<A, B, C> 
     where 
@@ -316,8 +327,8 @@ impl<const A: u8, B, C> ops::Add for Q<A, B, C>
     type Output = Result<Self>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let x: &Self = &self;
         let x: &B = &x._v;
         let y: &Self = &rhs;
@@ -336,8 +347,8 @@ where
     type Output = Result<Self>;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        debug_assert!(A >= 1u8);
-        debug_assert!(A <= 38u8);
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
         let x: &Self = &self;
         let x: &B = &x._v;
         let y: &Self = &rhs;
@@ -346,3 +357,134 @@ where
         Ok(new_with_custom_engine(&result, &self._engine))
     }
 }
+
+impl<const A: u8, B, C> ops::Mul for Q<A, B, C> 
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+
+    type Output = Result<Self>;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
+        let x: &Self = &self;
+        let y: &Self = &rhs;
+        self._engine.mul(x, y)
+    }
+}
+
+impl<const A: u8, B, C> ops::Div for Q<A, B, C>
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+    
+    type Output = Result<Self>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
+        let x: &Self = &self;
+        let y: &Self = &rhs;
+        self._engine.div(x, y)
+    }
+}
+
+impl<const A: u8, B, C> Ord for Q<A, B, C> 
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+
+    fn clamp(self, min: Self, max: Self) -> Self {
+        if self > max {
+            return max;
+        }
+        if self < min {
+            return min;
+        }
+        self
+    }
+
+    fn max(self, other: Self) -> Self {
+        if self > other {
+            return self;
+        }
+        other
+    }
+
+    fn min(self, other: Self) -> Self {
+        if self < other {
+            return self;
+        }
+        other
+    }
+
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
+        if self > other {
+            return cmp::Ordering::Greater
+        }
+        if self < other {
+            return cmp::Ordering::Less
+        }
+        cmp::Ordering::Equal
+    }
+}
+
+impl<const A: u8, B, C> PartialOrd for Q<A, B, C> 
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+
+    fn ge(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v >= y._v
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v <= y._v
+    }
+
+    fn gt(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v > y._v
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let y: &Self = other;
+        x._v < y._v
+    }
+
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<const A: u8, B, C> PartialEq for Q<A, B, C>
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {
+
+    fn eq(&self, other: &Self) -> bool {
+        let x: &Self = self;
+        let x: &B = &x._v;
+        let y: &Self = other;
+        let y: &B = &y._v;
+        x == y
+    }
+}
+
+impl<const A: u8, B, C> Eq for Q<A, B, C> 
+where
+    B: int::Int,
+    B: int_introspection::IntIntrospection,
+    C: Engine, precision::Precision<A>: precision::Compatible {}
