@@ -1,4 +1,11 @@
+
+### Section
+- [Symbols](symbol_legend.md)
+
+
 Although floating-point numbers are widely used, fixed-point values offer superior consistency and safety. Fixed-point numbers do not suffer from ambiguous standards, ensuring that numeric data is reliably transferred and decoded in the correct format.
+
+
 
 ###### Symbol Legend
 | Symbol |                                           |          |
