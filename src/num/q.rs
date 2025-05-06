@@ -251,12 +251,89 @@ fn _wide_mul(x: u128, y: u128) -> (u128, u128) {
     (a, b)
 }
 
+pub type Q1U8 = Q1<u8>;
+pub type Q2U8 = Q2<u8>;
+
+pub type Q1U16 = Q1<u16>;
+pub type Q2U16 = Q2<u16>;
+pub type Q3U16 = Q3<u16>;
+pub type Q4U16 = Q4<u16>;
+
+pub type Q1U32 = Q1<u32>;
+pub type Q2U32 = Q2<u32>;
+pub type Q3U32 = Q3<u32>;
+pub type Q4U32 = Q4<u32>;
+pub type Q5U32 = Q5<u32>;
+pub type Q6U32 = Q6<u32>;
+pub type Q7U32 = Q7<u32>;
+pub type Q8U32 = Q8<u32>;
+pub type Q9U32 = Q9<u32>;
+
+pub type Q1U64 = Q1<u64>;
+pub type Q2U64 = Q2<u64>;
+pub type Q3U64 = Q3<u64>;
+pub type Q4U64 = Q4<u64>;
+pub type Q5U64 = Q5<u64>;
+pub type Q6U64 = Q6<u64>;
+pub type Q7U64 = Q7<u64>;
+pub type Q8U64 = Q8<u64>;
+pub type Q9U64 = Q9<u64>;
+pub type Q10U64 = Q10<u64>;
+pub type Q11U64 = Q11<u64>;
+pub type Q12U64 = Q12<u64>;
+pub type Q13U64 = Q13<u64>;
+pub type Q14U64 = Q14<u64>;
+pub type Q15U64 = Q15<u64>;
+pub type Q16U64 = Q16<u64>;
+pub type Q17U64 = Q17<u64>;
+pub type Q18U64 = Q18<u64>;
+pub type Q19U64 = Q19<u64>;
+
+pub type Q1<T> = Q<1, T, default_engine::DefaultEngine>;
+pub type Q2<T> = Q<2, T, default_engine::DefaultEngine>;
+pub type Q3<T> = Q<3, T, default_engine::DefaultEngine>;
+pub type Q4<T> = Q<4, T, default_engine::DefaultEngine>;
+pub type Q5<T> = Q<5, T, default_engine::DefaultEngine>;
+pub type Q6<T> = Q<6, T, default_engine::DefaultEngine>;
+pub type Q7<T> = Q<7, T, default_engine::DefaultEngine>;
+pub type Q8<T> = Q<8, T, default_engine::DefaultEngine>;
+pub type Q9<T> = Q<9, T, default_engine::DefaultEngine>;
+pub type Q10<T> = Q<10, T, default_engine::DefaultEngine>;
+pub type Q11<T> = Q<11, T, default_engine::DefaultEngine>;
+pub type Q12<T> = Q<12, T, default_engine::DefaultEngine>;
+pub type Q13<T> = Q<13, T, default_engine::DefaultEngine>;
+pub type Q14<T> = Q<14, T, default_engine::DefaultEngine>;
+pub type Q15<T> = Q<15, T, default_engine::DefaultEngine>;
+pub type Q16<T> = Q<16, T, default_engine::DefaultEngine>;
+pub type Q17<T> = Q<17, T, default_engine::DefaultEngine>;
+pub type Q18<T> = Q<18, T, default_engine::DefaultEngine>;
+pub type Q19<T> = Q<19, T, default_engine::DefaultEngine>;
+pub type Q20<T> = Q<20, T, default_engine::DefaultEngine>;
+pub type Q21<T> = Q<21, T, default_engine::DefaultEngine>;
+pub type Q22<T> = Q<22, T, default_engine::DefaultEngine>;
+pub type Q23<T> = Q<23, T, default_engine::DefaultEngine>;
+pub type Q24<T> = Q<24, T, default_engine::DefaultEngine>;
+pub type Q25<T> = Q<25, T, default_engine::DefaultEngine>;
+pub type Q26<T> = Q<26, T, default_engine::DefaultEngine>;
+pub type Q27<T> = Q<27, T, default_engine::DefaultEngine>;
+pub type Q28<T> = Q<28, T, default_engine::DefaultEngine>;
+pub type Q29<T> = Q<29, T, default_engine::DefaultEngine>;
+pub type Q30<T> = Q<30, T, default_engine::DefaultEngine>;
+pub type Q31<T> = Q<31, T, default_engine::DefaultEngine>;
+pub type Q32<T> = Q<32, T, default_engine::DefaultEngine>;
+pub type Q33<T> = Q<33, T, default_engine::DefaultEngine>;
+pub type Q34<T> = Q<34, T, default_engine::DefaultEngine>;
+pub type Q35<T> = Q<35, T, default_engine::DefaultEngine>;
+pub type Q36<T> = Q<36, T, default_engine::DefaultEngine>;
+pub type Q37<T> = Q<37, T, default_engine::DefaultEngine>;
+pub type Q38<T> = Q<38, T, default_engine::DefaultEngine>;
+
 pub type Result<T> = ::core::result::Result<T, Error>;
 
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(PartialEq)]
-#[derive(thiserror::Error)]
+#[derive(::thiserror::Error)]
 pub enum Error {
     #[error("")]
     IntIntrospection(#[from] int_introspection::Error),
@@ -287,13 +364,13 @@ where
     _engine: C
 }
 
-pub fn new<const A: u8, B>(value: &B) -> Q<A, B, default_engine::DefaultEngine> 
+pub fn new<const A: u8, B>(value: B) -> Q<A, B, default_engine::DefaultEngine> 
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
     precision::Precision<A>: precision::Compatible {
     Q {
-        _v: *value,
+        _v: value,
         _engine: default_engine::new()
     }
 }
@@ -311,7 +388,8 @@ impl<const A: u8, B, C> Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
     
     pub fn sqrt(&self) -> Result<Self> {
         self._engine.sqrt(self)
@@ -362,7 +440,8 @@ impl<const A: u8, B, C> ops::Mul for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
 
     type Output = Result<Self>;
 
@@ -379,7 +458,8 @@ impl<const A: u8, B, C> ops::Div for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
     
     type Output = Result<Self>;
 
@@ -396,7 +476,8 @@ impl<const A: u8, B, C> Ord for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
 
     fn clamp(self, min: Self, max: Self) -> Self {
         if self > max {
@@ -437,7 +518,8 @@ impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
 
     fn ge(&self, other: &Self) -> bool {
         let x: &Self = self;
@@ -472,7 +554,8 @@ impl<const A: u8, B, C> PartialEq for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {
 
     fn eq(&self, other: &Self) -> bool {
         let x: &Self = self;
@@ -487,4 +570,5 @@ impl<const A: u8, B, C> Eq for Q<A, B, C>
 where
     B: int::Int,
     B: int_introspection::IntIntrospection,
-    C: Engine, precision::Precision<A>: precision::Compatible {}
+    C: Engine, 
+    precision::Precision<A>: precision::Compatible {}

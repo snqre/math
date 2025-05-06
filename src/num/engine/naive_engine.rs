@@ -4,6 +4,7 @@ use crate::num::q;
 
 #[derive(Debug)]
 #[derive(Clone)]
+#[derive(Copy)]
 pub struct NaiveEngine;
 
 pub fn new() -> NaiveEngine {
