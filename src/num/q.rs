@@ -251,13 +251,26 @@ fn _wide_mul(x: u128, y: u128) -> (u128, u128) {
     (a, b)
 }
 
+/// `0` -> `2.55E+01` `~25`
 pub type Q1U8 = Q1<u8>;
+
+/// `0` -> `2.55E+00` `~2`
 pub type Q2U8 = Q2<u8>;
 
+
+/// `0` -> `2.55E+03` `K ~6`
 pub type Q1U16 = Q1<u16>;
+
+/// `0` -> `2.55E+02` `~655`
 pub type Q2U16 = Q2<u16>;
+
+/// `0` -> `2.55E+01` `~64`
 pub type Q3U16 = Q3<u16>;
+
 pub type Q4U16 = Q4<u16>;
+
+
+
 
 pub type Q1U32 = Q1<u32>;
 pub type Q2U32 = Q2<u32>;
@@ -363,7 +376,6 @@ where
     _v: B,
     _engine: C
 }
-
 pub fn new<const A: u8, B>(value: B) -> Q<A, B, default_engine::DefaultEngine> 
 where
     B: int::Int,
