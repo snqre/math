@@ -7,58 +7,68 @@
 
 
 <h6>Symbols</h6>
-<div 
+<div
     style="
         display: flex;
-        border: 1px solid grey;
-        padding: 36px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 50px;
+        min-width: 100%;
     ">
-    <table 
-        style="
-            width: 100%;"
-        >
-        <tr>
-            <th>
-                Symbol
-            </th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>K</td>
-            <td>1,000</td>
-            <td>THOUSAND</td>
-        </tr>
-        <tr>
-            <td>M</td>
-            <td>1,000,000</td>
-            <td>MILLION</td>
-        </tr>
-        <tr>
-            <td>B</td>
-            <td>1,000,000,000</td>
-            <td>BILLION</td>
-        </tr>
-        <tr>
-            <td>T</td>
-            <td>1,000,000,000,000</td>
-            <td>TRILLION</td>
-        </tr>
-    </table>
-    <table style="width: 100%;">
-        <tr>
-            <th>Type</th>
-            <th>Range</th>
-        </tr>
-        <tr>
-            <td>u8</td>
-            <td>~255</td>
-        </tr>
-        <tr>
-            <td>u16</td>
-            <td>K ~65</td>
-        </tr>
-    </table>
+    <div>
+        <table>
+            <tr>
+                <th>
+                    Symbol
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>K</td>
+                <td>1,000</td>
+                <td>THOUSAND</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>1,000,000</td>
+                <td>MILLION</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>1,000,000,000</td>
+                <td>BILLION</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>1,000,000,000,000</td>
+                <td>TRILLION</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Range</th>
+            </tr>
+            <tr>
+                <td>u8</td>
+                <td>~255</td>
+            </tr>
+            <tr>
+                <td>u16</td>
+                <td>K ~65</td>
+            </tr>
+            <tr>
+                <td>u32</td>
+                <td>B ~4</td>
+            </tr>
+            <tr></tr>
+        </table>
+    </div>
 </div>
 
 

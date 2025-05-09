@@ -1,17 +1,14 @@
 #![no_std]
+#![deny(missing_debug_implementations)]
+#![allow(unused)]
 
-mod common;
-pub mod math;
-
-#[cfg(feature = "color")]
+mod num;
 mod color;
+mod point_2d;
+mod point_3d;
+mod trig;
 
-#[cfg(feature = "coordinate")]
-mod coordinate;
-
-mod direction_label;
-mod direction;
-
-mod point_2d_i;
-
-mod q;
+pub mod prelude {
+    pub use crate::num::int_i::Int as _;
+    pub use crate::num::int_introspection::Introspection as _;
+}

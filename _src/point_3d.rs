@@ -75,15 +75,14 @@ where
         _z: z
     }
 }
-
-toga::blockset! {
-    impl<const A: usize, B, C> Point3D<A, B, C>
-    where
-        B: int::Int,
-        B: int::Introspection,
-        C: q::Engine,
-        precision::Precision<A>: precision::Compatible;
-
+ 
+impl<const A: u8, B, C> Point3D<A, B, C>
+where
+    B: int_i::Int,
+    B: int_introspection::Introspection,
+    C: q::IsQEngine, 
+    precision::Precision<A>: precision::PrecisionCompatibleI {
+    
     pub fn distance_between(&self, rhs: &Self) -> Result<q::Q<A, B, C>> {
         let dx: q::Q<A, B, C> = (self._x - rhs._x)?;
         let dx: q::Q<A, B, C> = (dx * dx)?;
