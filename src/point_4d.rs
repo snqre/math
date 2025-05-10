@@ -47,12 +47,34 @@ where
     }
 }
 
-impl<const A: usize, B, C> Point4D<A, B, C> 
-where
-    B: int::Int,
-    B: int::Introspection,
-    C: q::Engine,
-    precision::Precision<A>: precision::Compatible {
+toga::blockset! {
+    impl<const A: usize, B, C> Point4D<A, B, C>
+    where
+        B: fmt::Debug,
+        B: int::Int,
+        B: int::Introspection,
+        C: q::Engine,
+        precision::Precision<A>: precision::Compatible;
+
+    fmt::Debug {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.debug_struct("Point4D")
+                .field("x", &self._x)
+                .field("y", &self._y)
+                .field("z", &self._z)
+                .field("t", &self._t)
+                .finish()
+        }
+    }
+}
+
+toga::blockset! {
+    impl<const A: usize, B, C> Point4D<A, B, C> 
+    where
+        B: int::Int,
+        B: int::Introspection,
+        C: q::Engine,
+        precision::Precision<A>: precision::Compatible;
 
     // a distnce between the two points in space and time
     pub fn distance_between_in_space_and_time() {
@@ -66,35 +88,20 @@ where
     pub fn distance_between() {
 
     }
-}
 
-impl<const A: usize, B, C> fmt::Debug for Point4D<A, B, C> 
-where
-    B: int::Int,
-    B: int::Introspection,
-    C: q::Engine,
-    precision::Precision<A>: precision::Compatible {
+    ops::Add {
+        type Output = Result<Self>;
 
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Point4D")
-            .field("x", &self._x)
-            .field("y", &self._y)
-            .field("z", &self._z)
-            .field("t", &self._t)
-            .finish()
+        fn add(self, rhs: Self) -> Self::Output {
+            
+        }
     }
-}
 
-impl<const A: usize, B, C> ops::Add for Point4D<A, B, C> 
-where
-    B: int::Int,
-    B: int::Introspection,
-    C: q::Engine,
-    precision::Precision<A>: precision::Compatible {
+    ops::Sub {
+        type Output = Result<Self>;
 
-    type Output = Result<Self>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        
+        fn sub(self, rhs: Self) -> Self::Output {
+            
+        }
     }
 }

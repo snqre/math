@@ -9,12 +9,36 @@ use ::core::fmt;
 use ::core::cmp;
 
 use int::Introspection as _;
+use num_traits::ToPrimitive as _;
 
 pub trait Engine 
 where
     Self: Sized,
     Self: Clone,
     Self: Copy {
+
+    fn cos<const A: usize, B>(&self, value: &Q<A, B, Self>) -> Result<Q<A, B, Self>>
+    where
+        B: int::Int,
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        let result: Q<A, B, Self> = self.sub(&from_int_with_custom_engine(90, *self)?, value)?;
+        let result: Q<A, B, Self> = self.sin(&result)?;
+        Ok(result)
+    }
+
+    // Bhaskara's sine approximation
+    fn sin<const A: usize, B>(&self, value: &Q<A, B, Self>) -> Result<Q<A, B, Self>> 
+    where
+        B: int::Int,
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        let lf: Q<A, B, Self> = self.mul(&from_int_with_custom_engine(4, *self)?, value)?;
+        let df: Q<A, B, Self> = self.sub(&from_int_with_custom_engine(180, *self)?, &lf)?;
+        let nm: Q<A, B, Self> = self.mul(&lf, &df)?;
+        let result: Q<A, B, Self> = self.div(&nm, &from_int_with_custom_engine(405, *self)?)?;
+        Ok(result)
+    }
 
     fn sqrt<const A: usize, B>(&self, x: &Q<A, B, Self>) -> Result<Q<A, B, Self>> 
     where 
@@ -76,6 +100,36 @@ where
         let result: C = C::from(result).unwrap();
         let result: Q<B, C, Self> = new_with_custom_engine(result, self.clone());
         Ok(result)
+    }
+
+    fn add<const A: usize, B>(
+        &self,
+        x: &Q<A, B, Self>,
+        y: &Q<A, B, Self>) -> Result<Q<A, B, Self>>
+    where
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
+        let x: B = x._v;
+        let y: B = y._v;
+        let result: B = x.checked_add(&y).ok_or(Error::Overflow)?;
+        Ok(new_with_custom_engine(result, *self))
+    }
+
+    fn sub<const A: usize, B>(
+        &self,
+        x: &Q<A, B, Self>,
+        y: &Q<A, B, Self>) -> Result<Q<A, B, Self>>
+    where
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        debug_assert!(A >= 1);
+        debug_assert!(A <= 38);
+        let x: B = x._v;
+        let y: B = y._v;
+        let result: B = x.checked_sub(&y).ok_or(Error::Underflow)?;
+        Ok(new_with_custom_engine(result, *self))
     }
 
     fn mul<const A: usize, B>(
@@ -208,7 +262,7 @@ where
     }
 }
 
-macro_rules! variant_u8_ {
+macro_rules! _variant_u8 {
     ($($precision:literal),*) => {
         paste::paste! {
             $(
@@ -218,9 +272,9 @@ macro_rules! variant_u8_ {
     };
 }
 
-variant_u8_!(1, 2);
+_variant_u8!(1, 2);
 
-macro_rules! variant_u16_ {
+macro_rules! _variant_u16 {
     ($($precision:literal),*) => {
         paste::paste! {
             $(
@@ -230,7 +284,7 @@ macro_rules! variant_u16_ {
     };
 }
 
-variant_u16_!(1, 2, 3, 4);
+_variant_u16!(1, 2, 3, 4);
 
 macro_rules! variant_u32_ {
     ($($precision:literal),*) => {
@@ -379,17 +433,17 @@ variant_i128_!(
     37, 38
 );
 
-macro_rules! variant_generic_ {
+macro_rules! _generic {
     ($($precision:literal),*) => {
         paste::paste! {
             $(
-                pub type [<Q $precision>]<T> = QDefault<$precision, T>;
+                pub type [<Q $precision>]<T> = Default<$precision, T>;
             )*
         }
     };
 } 
 
-variant_generic_!(
+_generic!(
     1, 2, 3,
     4, 5, 6,
     7, 8, 9,
@@ -405,7 +459,7 @@ variant_generic_!(
     37, 38
 );
 
-pub type QDefault<const A: usize, B> = Q<A, B, default_engine::DefaultEngine>;
+pub type Default<const A: usize, B> = Q<A, B, default_engine::DefaultEngine>;
 
 pub type Result<T> = ::core::result::Result<T, Error>;
 
@@ -461,6 +515,41 @@ where
     }
 }
 
+pub fn from_int<
+    const A: usize,
+    const B: usize,
+    C,
+    D>(value: C) -> Result<Default<B, D>> 
+where
+    C: int::Int,
+    C: int::Introspection,
+    D: int::Int,
+    D: int::Introspection,
+    precision::Precision<A>: precision::Compatible,
+    precision::Precision<B>: precision::Compatible {
+    from_int_with_custom_engine::<A, B, C, D, default_engine::DefaultEngine>(value, default_engine::DefaultEngine)
+}
+
+pub fn from_int_with_custom_engine<
+    const A: usize,
+    const B: usize, 
+    C, 
+    D,
+    E>(value: C, engine: E) -> Result<Q<B, D, E>> 
+where 
+    C: int::Int,
+    C: int::Introspection,
+    D: int::Int,
+    D: int::Introspection,
+    E: Engine,
+    precision::Precision<A>: precision::Compatible,
+    precision::Precision<B>: precision::Compatible {
+    let value: D = D::from(value).ok_or(Error::UnsupportedConversion)?;
+    let value: Q<A, D, E> = new_with_custom_engine(value, engine);
+    let value: Q<B, D, E> = value.cast()?;
+    Ok(value)
+}
+
 pub fn from_f32<const A: usize, B>(value: f32) -> Q<A, B, default_engine::DefaultEngine> 
 where
     B: int::Int,
@@ -488,8 +577,44 @@ pub fn from_f64_with_custom_engine<const A: usize, B, C>() {
 
 }
 
+pub fn pi_with_custom_engine<const A: usize, B, C>(engine: C) -> Result<Q<A, B, C>>
+where
+    B: int::Int,
+    B: int::Introspection,
+    C: Engine,
+    precision::Precision<A>: precision::Compatible {
+    if B::zero().is_signed() {
+        let pi: i128 = trig::PI_I128[A];
+        let pi: B = B::from(pi).ok_or(Error::UnsupportedConversion)?;
+        let pi: Q<A, B, C> = new_with_custom_engine(pi, engine);
+        return Ok(pi);
+    }
+    let pi: u128 = trig::PI_U128[A];
+    let pi: B = B::from(pi).ok_or(Error::UnsupportedConversion)?;
+    let pi: Q<A, B, C> = new_with_custom_engine(pi, engine);
+    Ok(pi)
+}
+
+pub fn pi<const A: usize, B>() -> Default<A, B> 
+where
+    B: int::Int,
+    B: int::Introspection,
+    precision::Precision<A>: precision::Compatible {
+    if B::zero().is_signed() {
+        let pi: i128 = trig::PI_I128[A];
+        let pi: B = B::from(pi).unwrap();
+        let pi: Default<A, B> = new(pi);
+        return pi;
+    }
+    let pi: u128 = trig::PI_U128[A];
+    let pi: B = B::from(pi).unwrap();
+    let pi: Default<A, B> = new(pi);
+    pi
+}
+
 toga::blockset! {
-    impl<const A: usize, B, C> Q<A, B, C> where
+    impl<const A: usize, B, C> Q<A, B, C> 
+    where
         B: int::Int,
         B: int::Introspection,
         C: Engine,
@@ -504,10 +629,10 @@ toga::blockset! {
         E: int::Int,
         E: int::Introspection,
         precision::Precision<D>: precision::Compatible {
-        let value: Q<D, B> = self.cast()?;
+        let value: Q<D, B, C> = self.cast()?;
         let value: B = value._v;
         let value: E = E::from(value).ok_or(Error::UnsupportedConversion)?;
-        let value: Q<D, E> = new_with_custom_engine(value, value._engine);
+        let value: Q<D, E, C> = new_with_custom_engine(value, self._engine);
         Ok(value)
     }
 
@@ -521,31 +646,126 @@ toga::blockset! {
     }
 
     pub fn cos(&self) -> Result<Self> {
-        
+        self._engine.cos(self)
     }
 
     pub fn sin(&self) -> Result<Self> {
-
+        self._engine.sin(self)
     }
 
     pub fn tan(&self) -> Result<Self> {
-
+        self._engine.tan(self)
     }
 
-    pub fn pow(&self) -> Result<Self> {
+    pub fn pow<D>(&self, exponent: D) -> Result<Self> 
+    where
+        D: int::Int,
+        D: int::Introspection {
+        
+    }
 
+    pub fn sqrt(&self) -> Result<Self> {
+        self._engine.sqrt(self)
+    }
+
+    pub fn to_radians(&self) -> Result<Self> {
+        let pi: Self = pi_with_custom_engine(self._engine)?;
+        let one_eighty: Self = new_with_custom_engine(180, self._engine);
+        let result: Self = ((pi * self)? / one_eighty)?;
+        Ok(result)
+    }
+
+    pub fn to_degrees(&self) -> Result<Self> {
+        Ok(((from_int_with_custom_engine(180, self._engine)? * *self)? / pi_with_custom_engine(self._engine)?)?)
+    }
+
+    pub fn to_f64(&self) -> Result<f64> {
+        if B::zero().is_signed() {
+            let scale: f64 = precision::SCALE_I128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
+            let value: f64 = self._v.to_i128().unwrap().to_f64().ok_or(Error::UnsupportedConversion)?;
+            return Ok(value / scale)
+        }
+        let scale: f64 = precision::SCALE_U128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
+        let value: f64 = self._v.to_f64().ok_or(Error::UnsupportedConversion)?;
+        Ok(value / scale)
+    }
+
+    pub fn to_f32(&self) -> Result<f32> {
+        if B::zero().is_signed() {
+            let scale: f32 = precision::SCALE_I128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
+            let value: f32 = self._v.to_i128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
+            return Ok(value / scale)
+        }
+        let scale: f32 = precision::SCALE_U128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
+        let value: f32 = self._v.to_u128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
+        Ok(value / scale)
+    }
+
+    pub fn to_i8(&self) -> Result<i8> {
+        let result: i8 = self._v.to_i8().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_i16(&self) -> Result<i16> {
+        let result: i16 = self._v.to_i16().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_i32(&self) -> Result<i32> {
+        let result: i32 = self._v.to_i32().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_i64(&self) -> Result<i64> {
+        let result: i64 = self._v.to_i64().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_i128(&self) -> Result<i128> {
+        let result: i128 = self._v.to_i128().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_isize(&self) -> Result<isize> {
+        let result: isize = self._v.to_isize().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_u8(&self) -> Result<u8> {
+        let result: u8 = self._v.to_u8().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_u16(&self) -> Result<u16> {
+        let result: u16 = self._v.to_u16().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_u32(&self) -> Result<u32> {
+        let result: u32 = self._v.to_u32().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_u64(&self) -> Result<u64> {
+        let result: u64 = self._v.to_u64().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
+    }
+
+    pub fn to_u128(&self) -> Result<u128> {
+        let result: u128 = self._v.to_u128().ok_or(Error::UnsupportedConversion)?;
+        Ok(result)
     }
 
     fmt::Debug {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let value: f32 = self.try_into()?;
+            let value: f32 = self.to_f32().unwrap();
             write!(f, "{}", value)
         }
     }
 
     fmt::Display {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let value: f32 = self.try_into()?;
+            let value: f32 = self.to_f32().unwrap();
             write!(f, "{}", value)
         }
     }
@@ -557,11 +777,8 @@ toga::blockset! {
             debug_assert!(A >= 1);
             debug_assert!(A <= 38);
             let x: &Self = &self;
-            let x: &B = &x._v;
             let y: &Self = &rhs;
-            let y: &B = &y._v;
-            let result: B = x.checked_add(y).ok_or(Error::Overflow)?;
-            Ok(new_with_custom_engine(result, self._engine))
+            self._engine.add(x, y)
         }
     }
 
@@ -572,11 +789,8 @@ toga::blockset! {
             debug_assert!(A >= 1);
             debug_assert!(A <= 38);
             let x: &Self = &self;
-            let x: &B = &x._v;
             let y: &Self = &rhs;
-            let y: &B = &y._v;
-            let result: B = x.checked_sub(y).ok_or(Error::Underflow)?;
-            Ok(new_with_custom_engine(result, self._engine))
+            self._engine.sub(x, y)
         }
     }
 
@@ -683,112 +897,37 @@ toga::blockset! {
     Eq {}
 }
 
+#[cfg(test)]
+mod test {
+    use super::*;
 
+    #[rstest::rstest]
+    #[case(new(100), new(100), new::<2, u128>(200))]
+    pub fn add<const A: usize, B>(
+        #[case] x: Default<A, B>,
+        #[case] y: Default<A, B>,
+        #[case] ok: Default<A, B>
+    ) 
+    where 
+        B: int::Int,
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        let result: Default<A, B> = (x + y).unwrap();
+        assert_eq!(result, ok);
+    }
 
-
-macro_rules! try_from_and_try_into_int_ {
-    ($($size:ty),*) => {
-        paste::paste! {
-            $(
-                impl<const A: usize, B> TryFrom<$size> for Q<A, B, default_engine::DefaultEngine> 
-                where
-                    B: int::Int,
-                    B: int::Introspection,
-                    precision::Precision<A>: precision::Compatible {
-                    
-                    type Error = Error;
-                
-                    fn try_from(value: $size) -> core::result::Result<Self, Self::Error> {
-                        let value: B = B::from(value).ok_or(Error::UnsupportedConversion)?;
-                        Ok(new(value))
-                    }
-                }
-    
-                impl<const A: usize, B> TryInto<$size> for Q<A, B, default_engine::DefaultEngine> 
-                where
-                    B: int::Int,
-                    B: int::Introspection,
-                    precision::Precision<A>: precision::Compatible {
-                    
-                    type Error = Error;
-                
-                    fn try_into(self) -> core::result::Result<$size, Self::Error> {
-                        let value: $size = self._v.[<to_ $size>]().ok_or(Error::UnsupportedConversion)?;
-                        Ok(value)
-                    }
-                }
-            )*
-        }
-    };
-} 
-
-try_from_and_try_into_int_!(
-    u8,
-    u16,
-    u32,
-    u64,
-    u128,
-    usize,
-    i8,
-    i16,
-    i32,
-    i64,
-    i128,
-    isize
-);
-
-macro_rules! try_from_and_try_into_float_ {
-    ($($size:ty),*) => {
-        paste::paste! {
-            $(
-                impl<const A: usize, B> TryFrom<$size> for Q<A, B, default_engine::DefaultEngine> 
-                where
-                    B: int::Int,
-                    B: int::Introspection,
-                    precision::Precision<A>: precision::Compatible {
-                    
-                    type Error = Error;
-                
-                    fn try_from(value: $size) -> core::result::Result<Self, Self::Error> {
-                        let scale: u128 = precision::SCALE_U128[A];
-                        let scale: $size = scale.into();
-                        let value_scaled: $size = (value * scale).round();
-                        if B::zero().is_signed() {
-                            let value: i128 = value_scaled.into();
-                            let value: B = B::from(value).ok_or(Error::UnsupportedConversion)?;
-                            return Ok(new(value))
-                        }
-                        if value_scaled < 0.0 {
-                            return Err(Error::UnsupportedConversion)
-                        }
-                        let value: u128 = value_scaled.into();
-                        let value: B = B::from(value).ok_or(Error::UnsupportedConversion)?;
-                        Ok(new(value))
-                    }
-                }
-                
-                impl<const A: usize, B> TryInto<$size> for Q<A, B, default_engine::DefaultEngine> 
-                where
-                    B: int::Int,
-                    B: int::Introspection,
-                    precision::Precision<A>: precision::Compatible {
-                    
-                    type Error = Error;
-                
-                    fn try_into(self) -> core::result::Result<$size, Self::Error> {
-                        if B::zero().is_signed() {
-                            let scale: $size = precision::SCALE_I128[A].into();
-                            let value: $size = self._v.to_i128().unwrap().into();
-                            return Ok(value / scale)
-                        }
-                        let scale: $size = precision::SCALE_U128[A].into();
-                        let value: $size = self._v.to_u128().unwrap().into();
-                        Ok(value / scale)
-                    }
-                }
-            )*
-        }
-    };
-} 
-
-try_from_and_try_into_float_!(f32, f64);
+    #[rstest::rstest]
+    #[case(new(100), new(100), new::<2, u128>(0))]
+    pub fn sub<const A: usize, B>(
+        #[case] x: Default<A, B>,
+        #[case] y: Default<A, B>,
+        #[case] ok: Default<A, B>
+    )
+    where 
+        B: int::Int,
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        let result: Default<A, B> = (x - y).unwrap();
+        assert_eq!(result, ok);
+    }
+}

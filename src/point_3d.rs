@@ -1,8 +1,7 @@
-use crate::num::int_i;
-use crate::num::int_introspection;
-use crate::num::precision;
-use crate::num::q;
-use crate::num::engine::default_engine;
+use crate::int;
+use crate::precision;
+use crate::q;
+use crate::default_engine;
 
 pub type Point3DQ1U8 = Point3DQ1<u8>;
 pub type Point3DQ2U8 = Point3DQ2<u8>;
@@ -35,24 +34,25 @@ pub enum Error {
 }
 
 #[derive(Clone)]
-pub struct Point3D<const A: u8, B, C> where
-    B: int_i::Int,
-    B: int_introspection::Introspection,
-    C: q::IsQEngine, precision::Precision<A>: precision::PrecisionCompatibleI {
+pub struct Point3D<const A: usize, B, C> 
+where
+    B: int::Int,
+    B: int::Introspection,
+    C: q::Engine, precision::Precision<A>: precision::Compatible {
     _x: q::Q<A, B, C>,
     _y: q::Q<A, B, C>,
     _z: q::Q<A, B, C>
 }
 
-pub fn new<const A: u8, B, C>(
+pub fn new<const A: usize, B, C>(
     x: &q::Q<A, B, C>,
     y: &q::Q<A, B, C>,
     z: &q::Q<A, B, C>
 ) -> Point3D<A, B, C> 
 where
-    B: int_i::Int,
-    B: int_introspection::Introspection,
-    C: q::IsQEngine, precision::Precision<A>: precision::PrecisionCompatibleI {
+    B: int::Int,
+    B: int::Introspection,
+    C: q::Engine, precision::Precision<A>: precision::Compatible {
     Point3D {
         _x: x.clone(),
         _y: y.clone(),
@@ -60,13 +60,13 @@ where
     }
 }
 
-pub fn default<const A: u8, B>() -> Point3D<A, B, default_engine::DefaultEngine> 
+pub fn default<const A: usize, B>() -> Point3D<A, B, default_engine::DefaultEngine> 
 where
-    B: int_i::Int,
-    B: int_introspection::Introspection, 
-    precision::Precision<A>: precision::PrecisionCompatibleI {
+    B: int::Int,
+    B: int::Introspection, 
+    precision::Precision<A>: precision::Compatible {
     let zero: B = B::zero();
-    let x: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
+    let x: q::Default<A, B> = q::new(zero);
     let y: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     let z: q::Q<A, B, default_engine::DefaultEngine> = q::new(zero);
     Point3D {
