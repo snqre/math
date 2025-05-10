@@ -88,20 +88,4 @@ toga::blockset! {
     pub fn distance_between() {
 
     }
-
-    ops::Add {
-        type Output = Result<Self>;
-
-        fn add(self, rhs: Self) -> Self::Output {
-            
-        }
-    }
-
-    ops::Sub {
-        type Output = Result<Self>;
-
-        fn sub(self, rhs: Self) -> Self::Output {
-            
-        }
-    }
 }

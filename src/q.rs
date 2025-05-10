@@ -17,6 +17,14 @@ where
     Self: Clone,
     Self: Copy {
 
+    fn tan<const A: usize, B>(&self, value: &Q<A, B, Self>) -> Result<Q<A, B, Self>>
+    where
+        B: int::Int,
+        B: int::Introspection,
+        precision::Precision<A>: precision::Compatible {
+        todo!()
+    }
+
     fn cos<const A: usize, B>(&self, value: &Q<A, B, Self>) -> Result<Q<A, B, Self>>
     where
         B: int::Int,
@@ -636,15 +644,6 @@ toga::blockset! {
         Ok(value)
     }
 
-    pub fn abs(&self) -> Result<Self> {
-        if self._v.is_signed() && self._v.to_i128().unwrap() < 0 {
-            let value: B = self._v.wrapping_neg();
-            let value: Self = new_with_custom_engine(value, self._engine);
-            return Ok(value)
-        }
-        Ok(self)
-    }
-
     pub fn cos(&self) -> Result<Self> {
         self._engine.cos(self)
     }
@@ -657,22 +656,12 @@ toga::blockset! {
         self._engine.tan(self)
     }
 
-    pub fn pow<D>(&self, exponent: D) -> Result<Self> 
-    where
-        D: int::Int,
-        D: int::Introspection {
-        
-    }
-
     pub fn sqrt(&self) -> Result<Self> {
         self._engine.sqrt(self)
     }
 
     pub fn to_radians(&self) -> Result<Self> {
-        let pi: Self = pi_with_custom_engine(self._engine)?;
-        let one_eighty: Self = new_with_custom_engine(180, self._engine);
-        let result: Self = ((pi * self)? / one_eighty)?;
-        Ok(result)
+        Ok(((pi_with_custom_engine(self._engine)? * *self)? / from_int_with_custom_engine(180, self._engine)?)?)
     }
 
     pub fn to_degrees(&self) -> Result<Self> {
@@ -895,6 +884,25 @@ toga::blockset! {
     }
 
     Eq {}
+}
+
+toga::blockset! {
+    impl<const A: usize, B, C> Q<A, B, C> 
+    where
+        B: int::Int,
+        B: int::Introspection,
+        B: num_traits::WrappingNeg,
+        C: Engine,
+        precision::Precision<A>: precision::Compatible;
+
+    pub fn abs(&self) -> Result<Self> {
+        if self._v.is_signed() && self._v.to_i128().unwrap() < 0 {
+            let value: B = self._v.wrapping_neg();
+            let value: Self = new_with_custom_engine(value, self._engine);
+            return Ok(value)
+        }
+        Ok(*self)
+    }
 }
 
 #[cfg(test)]
