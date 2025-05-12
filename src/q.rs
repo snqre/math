@@ -11,6 +11,8 @@ use ::core::cmp;
 use int::Introspection as _;
 use num_traits::ToPrimitive as _;
 
+// The Engine is expected to be stateless and light as it will be copied around several
+// times.
 pub trait Engine 
 where
     Self: Sized,
@@ -154,7 +156,7 @@ where
             let scale: i128 = precision::SCALE_I128[A];
             let result: i128 = self.muldiv(&x, &y, &scale)?;
             let result: B = B::from(result).unwrap();
-            let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+            let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
             return Ok(result)
         }
         let x: u128 = x.to_u128().unwrap();
@@ -162,7 +164,7 @@ where
         let scale: u128 = precision::SCALE_U128[A];
         let result: u128 = self.muldiv(&x, &y, &scale)?;
         let result: B = B::from(result).unwrap();
-        let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+        let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
         Ok(result)
     }
 
@@ -186,13 +188,13 @@ where
                 let z: u32 = scale.trailing_zeros();
                 let result: i128 = (x << z).checked_div(y).ok_or(Error::DivisionByZero)?;
                 let result: B = B::from(result).unwrap();
-                let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+                let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
                 return Ok(result)
             }
             let scale: i128 = precision::SCALE_I128[A];
             let result: i128 = self.muldiv(&x, &scale, &y)?;
             let result: B = B::from(result).unwrap();
-            let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+            let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
             return Ok(result)
         }
         let x: u128 = x.to_u128().unwrap();
@@ -201,12 +203,12 @@ where
             let z: u32 = scale.trailing_zeros();
             let result: u128 = (x << z).checked_div(y).ok_or(Error::DivisionByZero)?;
             let result: B = B::from(result).unwrap();
-            let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+            let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
             return Ok(result)
         }
         let result: u128 = self.muldiv(&x, &scale, &y)?;
         let result: B = B::from(result).unwrap();
-        let result: Q<A, B, Self> = new_with_custom_engine(result, self.clone());
+        let result: Q<A, B, Self> = new_with_custom_engine(result, *self);
         Ok(result)
     }
 
@@ -511,6 +513,15 @@ where
     }
 }
 
+pub fn new_with_engine_from<const A: usize, B, C>(value: B, sample: Q<A, B, C>) -> Q<A, B, C> 
+where
+    B: int::Int,
+    B: int::Introspection,
+    C: Engine,
+    precision::Precision<A>: precision::Compatible {
+    new_with_custom_engine(value, sample._engine)
+}
+
 pub fn new_with_custom_engine<const A: usize, B, C>(value: B, engine: C) -> Q<A, B, C>
 where
     B: int::Int,
@@ -538,6 +549,28 @@ where
     from_int_with_custom_engine::<A, B, C, D, default_engine::DefaultEngine>(value, default_engine::DefaultEngine)
 }
 
+pub fn from_int_with_engine_from<
+    const A: usize,
+    const B: usize,
+    C,
+    D,
+    E,
+    const F: usize,
+    G>(value: C, sample: Q<F, G, E>) -> Result<Q<B, D, E>> 
+where
+    C: int::Int,
+    C: int::Introspection,
+    D: int::Int,
+    D: int::Introspection,
+    E: Engine,
+    G: int::Int,
+    G: int::Introspection,
+    precision::Precision<A>: precision::Compatible,
+    precision::Precision<B>: precision::Compatible,
+    precision::Precision<F>: precision::Compatible {
+    from_int_with_custom_engine::<A, B, C, D, E>(value, sample._engine)
+}
+
 pub fn from_int_with_custom_engine<
     const A: usize,
     const B: usize, 
@@ -558,6 +591,9 @@ where
     Ok(value)
 }
 
+
+
+#[cfg(feature = "float")]
 pub fn from_f32<const A: usize, B>(value: f32) -> Q<A, B, default_engine::DefaultEngine> 
 where
     B: int::Int,
@@ -566,6 +602,7 @@ where
     from_f32_with_custom_engine(value, default_engine::new())
 }
 
+#[cfg(feature = "float")]
 pub fn from_f32_with_custom_engine<const A: usize, B, C>(value: f32, engine: C) -> Q<A, B, C> 
 where
     B: int::Int,
@@ -581,6 +618,16 @@ where
     }
 }
 
+#[cfg(feature = "float")]
+pub fn from_f64<const A: usize, B>(value: f64) -> Default<A, B>
+where
+    B: int::Int,
+    B: int::Introspection,
+    precision::Precision<A>: precision::Compatible {
+    
+}
+
+#[cfg(feature = "float")]
 pub fn from_f64_with_custom_engine<const A: usize, B, C>() {
 
 }
@@ -661,33 +708,11 @@ toga::blockset! {
     }
 
     pub fn to_radians(&self) -> Result<Self> {
-        Ok(((pi_with_custom_engine(self._engine)? * *self)? / from_int_with_custom_engine(180, self._engine)?)?)
+        (pi_with_custom_engine(self._engine)? * *self)? / from_int_with_custom_engine(180, self._engine)?
     }
 
     pub fn to_degrees(&self) -> Result<Self> {
-        Ok(((from_int_with_custom_engine(180, self._engine)? * *self)? / pi_with_custom_engine(self._engine)?)?)
-    }
-
-    pub fn to_f64(&self) -> Result<f64> {
-        if B::zero().is_signed() {
-            let scale: f64 = precision::SCALE_I128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
-            let value: f64 = self._v.to_i128().unwrap().to_f64().ok_or(Error::UnsupportedConversion)?;
-            return Ok(value / scale)
-        }
-        let scale: f64 = precision::SCALE_U128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
-        let value: f64 = self._v.to_f64().ok_or(Error::UnsupportedConversion)?;
-        Ok(value / scale)
-    }
-
-    pub fn to_f32(&self) -> Result<f32> {
-        if B::zero().is_signed() {
-            let scale: f32 = precision::SCALE_I128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
-            let value: f32 = self._v.to_i128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
-            return Ok(value / scale)
-        }
-        let scale: f32 = precision::SCALE_U128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
-        let value: f32 = self._v.to_u128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
-        Ok(value / scale)
+        (from_int_with_custom_engine(180, self._engine)? * *self)? / pi_with_custom_engine(self._engine)?
     }
 
     pub fn to_i8(&self) -> Result<i8> {
@@ -743,20 +768,6 @@ toga::blockset! {
     pub fn to_u128(&self) -> Result<u128> {
         let result: u128 = self._v.to_u128().ok_or(Error::UnsupportedConversion)?;
         Ok(result)
-    }
-
-    fmt::Debug {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let value: f32 = self.to_f32().unwrap();
-            write!(f, "{}", value)
-        }
-    }
-
-    fmt::Display {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let value: f32 = self.to_f32().unwrap();
-            write!(f, "{}", value)
-        }
     }
 
     ops::Add {
@@ -884,6 +895,76 @@ toga::blockset! {
     }
 
     Eq {}
+}
+
+#[cfg(not(feature = "float"))]
+toga::blockset! {
+    impl<const A: usize, B, C> Q<A, B, C> 
+    where
+        B: int::Int,
+        B: int::Introspection,
+        B: fmt::Debug,
+        B: fmt::Display,
+        C: Engine,
+        precision::Precision<A>: precision::Compatible;
+
+    fmt::Debug {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self._v)
+        }
+    }
+
+    fmt::Display {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self._v)
+        }
+    }
+}
+
+#[cfg(feature = "float")]
+toga::blockset! {
+    impl<const A: usize, B, C> Q<A, B, C> 
+    where
+        B: int::Int,
+        B: int::Introspection,
+        C: Engine,
+        precision::Precision<A>: precision::Compatible;
+
+    pub fn to_f64(&self) -> Result<f64> {
+        if B::zero().is_signed() {
+            let scale: f64 = precision::SCALE_I128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
+            let value: f64 = self._v.to_i128().unwrap().to_f64().ok_or(Error::UnsupportedConversion)?;
+            return Ok(value / scale)
+        }
+        let scale: f64 = precision::SCALE_U128[A].to_f64().ok_or(Error::UnsupportedConversion)?;
+        let value: f64 = self._v.to_f64().ok_or(Error::UnsupportedConversion)?;
+        Ok(value / scale)
+    }
+
+    pub fn to_f32(&self) -> Result<f32> {
+        if B::zero().is_signed() {
+            let scale: f32 = precision::SCALE_I128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
+            let value: f32 = self._v.to_i128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
+            return Ok(value / scale)
+        }
+        let scale: f32 = precision::SCALE_U128[A].to_f32().ok_or(Error::UnsupportedConversion)?;
+        let value: f32 = self._v.to_u128().unwrap().to_f32().ok_or(Error::UnsupportedConversion)?;
+        Ok(value / scale)
+    }
+
+    fmt::Debug {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let value: f32 = self.to_f32().unwrap();
+            write!(f, "{}", value)
+        }
+    }
+
+    fmt::Display {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let value: f32 = self.to_f32().unwrap();
+            write!(f, "{}", value)
+        }
+    }
 }
 
 toga::blockset! {

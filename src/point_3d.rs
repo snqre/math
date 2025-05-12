@@ -45,18 +45,18 @@ where
 }
 
 pub fn new<const A: usize, B, C>(
-    x: &q::Q<A, B, C>,
-    y: &q::Q<A, B, C>,
-    z: &q::Q<A, B, C>
+    x: q::Q<A, B, C>,
+    y: q::Q<A, B, C>,
+    z: q::Q<A, B, C>
 ) -> Point3D<A, B, C> 
 where
     B: int::Int,
     B: int::Introspection,
     C: q::Engine, precision::Precision<A>: precision::Compatible {
     Point3D {
-        _x: x.clone(),
-        _y: y.clone(),
-        _z: z.clone()
+        _x: x,
+        _y: y,
+        _z: z
     }
 }
 

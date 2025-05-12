@@ -1,7 +1,6 @@
 use crate::precision;
 use crate::int;
 use crate::q;
-use core::ops;
 use core::fmt;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -86,6 +85,6 @@ toga::blockset! {
     }
     
     pub fn distance_between() {
-
+        
     }
 }

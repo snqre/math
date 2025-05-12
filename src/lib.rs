@@ -14,6 +14,7 @@ pub mod engine {
 pub mod precision;
 pub mod q;
 
+mod color;
 mod default_engine;
 mod int;
 mod math;
