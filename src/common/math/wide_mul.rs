@@ -16,8 +16,11 @@ where
     T: int::Int {
     assert!(T::IS_SIGNED);
     assert!(T::BIT <= 64);
-    let n: usize = T::BITS_USIZE / T::TWO_USIZE;
-    let mask: T = (T::ONE << n) - T::ONE;
+    let a: usize = T::BIT as usize;
+    let b: u8 = T::N2_U128.try_into().unwrap();
+    let b: usize = b as usize;
+    let n: usize = a / b;
+    let mask: T = (T::N1 << n) - T::N1;
     let (lo_lo, lo_hi, hi_lo, hi_hi) = {
         let x_lo: T = x & mask;
         let x_hi: T = x >> n;
@@ -32,9 +35,9 @@ where
     let a: T = lo_hi.checked_add(&hi_lo).ok_or(Error::Overflow)?;
     let b: T = a << n;
     let hi: T = if lo_lo > lo_lo.wrapping_add(&b) {
-        T::ONE
+        T::N1
     } else {
-        T::ZERO
+        T::N0
     };
     let hi: T = hi_hi
         .checked_add(&(a >> n))
@@ -42,15 +45,15 @@ where
         .checked_add(&hi)
         .ok_or(Error::Overflow)?;
     let lo: T = lo_lo.wrapping_add(&b);
-    (lo, hi).into_ok()
+    Ok((lo, hi))
 }
 
 #[inline]
 fn b<T>(x: T, y: T) -> Result<(T, T)> 
 where 
     T: int::Int, {
-    assert!(T::IS_UNSIGNED);
-    assert!(T::BITS_USIZE <= 64);
+    assert!(!T::IS_SIGNED);
+    assert!(T::BIT <= 64);
     let (x, y) = unsafe {
         let x: u128 = x.to_u128().unwrap_unchecked();
         let y: u128 = y.to_u128().unwrap_unchecked();
@@ -73,11 +76,11 @@ where
         let b: u128 = hi_hi + m_hi + c + ((a < lo_lo) as u128);
         (a, b)
     };
-    if T::BITS_USIZE == 128 {
+    if T::BIT == 128 {
         unsafe {
             let a: T = T::from(a).unwrap_unchecked();
             let b: T = T::from(b).unwrap_unchecked();
-            return (a, b).into_ok()
+            return Ok((a, b))
         }
     }
     if a > T::MAX_U128 {

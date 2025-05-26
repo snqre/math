@@ -82,13 +82,16 @@ where
 
 // --- --- ---
 
-pub trait TrigReciprocalEngine {
+pub trait TrigReciprocalEngine 
+where
+    Self: TrigEngine {
     #[inline]
     fn csc<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
         let out: B = self.sin::<A, _>(angle)?;
-        self.div::<A, _>(scale::into::<A, _>(), out)
+        let out: B = self.div::<A, _>(scale::into::<A, _>(), out)?;
+        Ok(out)
     }
     
     #[inline]
