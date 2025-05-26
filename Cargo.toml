@@ -3,20 +3,20 @@ name = "math"
 version = "0.1.0"
 edition = "2024"
 
+[dev-dependencies.criterion]
+version = "=0.4"
+features = ["html_reports"]
+
 [dependencies]
-paste = "1.0.15"
-rand = "0.9.1"
-rstest = "0.25.0"
-sealed = "0.6.0"
-serde = { version = "*" }
-[dependencies.toga]
-version = "0.1.1"
-git = "https://github.com/snqre/toga.git"
-[dependencies.boiler]
-version = "*"
-git = "https://github.com/snqre/boiler.git"
-[dependencies.automod]
-version = "*"
+paste = { version = "=1.0.15" }
+rstest = { version = "0.25.0" }
+toga = { version =  "0.1.1", git = "https://github.com/snqre/toga.git" }
+versal = { version = "0.1.0" }
+
+serde = { version = "*", optional = true }
+static_assertions = "1.1.0"
+
+
 [dependencies.num-traits]
 version = "=0.2.19"
 [dependencies.thiserror]
@@ -33,20 +33,25 @@ version = "2"
 features = ["derive"]
 optional = true
 
-[dev-dependencies]
-criterion = { version = "0.5.1" }
+
 
 [features]
-default = ["ink", "coordinate"]
+default = ["ink"]
+std = [
+    "dep:serde"
+]
 ink = [
     "dep:ink",
     "dep:parity-scale-codec",
     "dep:scale-info"    
 ]
-float = []
-color = []
-coordinate = []
-std = []
+
+[profile.bench]
+lto = true
+codegen-units = 1
+overflow-checks = false
+debug = false
+opt-level = 3
 
 [profile.dev]
 overflow-checks = true

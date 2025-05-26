@@ -1,0 +1,28 @@
+explorer:
+  rows:
+    - items:
+        - type: container
+          style:
+            display: flex
+            flexDirection: row
+            padding: 3px
+            columnGap: 3px
+          items:
+            - type: svg
+              elementStyle:
+                width: 50
+              url: https://cdn.worldvectorlogo.com/logos/typescript-2.svg
+            - type: container
+              style:
+                marginLeft: 8px
+                display: flex
+                flexDirection: column
+                justifyContent: center
+                rowGap: 3px
+              items:
+                - type: text
+                  text: Title
+                  style:
+                    fontSize: 20px
+                - type: text
+                  text: See Readme for more info about Code Banner
