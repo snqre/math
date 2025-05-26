@@ -118,7 +118,8 @@ where
 
 pub trait TrigEngine 
 where
-    Self: BaseEngine {
+    Self: BaseEngine,
+    Self: TrigConversionEngine {
     #[inline]
     fn tan<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
@@ -132,18 +133,21 @@ where
     fn sin<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        self.cos::<A, _>(self.sub(self.to_radian::<A, _>(deg90::<A, _>()?)?, angle)?)
+        let rad90: B = self.to_radian::<A, _>(deg90::<A, _>()?)?;
+        let out: B = self.sub(rad90, angle)?;
+        let out: B = self.cos::<A, _>(out)?;
+        Ok(out)
     }
 
     #[inline]
     fn cos<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        let scale: B = self.scale::<A, _>();
-        let pi: B = self.pi::<A, _>();
-        let pi_two: B = pi.checked_mul(&B::TWO).ok_or(Error::Overflow)?;
+        let scale: B = scale::into::<A, _>();
+        let pi: B = pi::into::<A, _>();
+        let pi_two: B = pi.checked_mul(&B::N2).ok_or(Error::Overflow)?;
         let mut n: B = angle % pi_two;
-        if n < B::ZERO {
+        if n < B::N0 {
             n = n.checked_add(&pi_two).ok_or(Error::Overflow)?;
         }
         if n > pi {
@@ -152,12 +156,12 @@ where
         let mut term: B = scale;
         let mut result: B = scale;
         let mut sign: bool = true;
-        let mut k: B = B::ONE;
+        let mut k: B = B::N1;
         loop {
             term = self.muldiv(term, n, scale)?;
             term = self.muldiv(term, n, scale)?;
-            term = term.checked_div(&((B::TWO * k - B::ONE) * (B::TWO * k))).ok_or(Error::DivisionByZero)?;
-            if term == B::ZERO {
+            term = term.checked_div(&((B::N2 * k - B::N1) * (B::N2 * k))).ok_or(Error::DivisionByZero)?;
+            if term == B::N0 {
                 break;
             }
             result = if sign {
@@ -166,7 +170,7 @@ where
                 result.checked_add(&term).ok_or(Error::Overflow)?
             };
             sign = !sign;
-            k = k.checked_add(&B::ONE).ok_or(Error::Overflow)?;
+            k = k.checked_add(&B::N1).ok_or(Error::Overflow)?;
         }
         Ok(result)
     }
@@ -212,8 +216,8 @@ where
         let n: B = unsafe {
             B::from(n).unwrap_unchecked()
         };
-        let scale: B = self.scale::<A, _>();
-        let pi: B = self.pi::<A, _>();
+        let scale: B = scale::into::<A, _>();
+        let pi: B = pi::into::<A, _>();
         self.muldiv(angle, pi, n * scale)
     }
     
@@ -267,7 +271,7 @@ where
     fn div<const A: u8, B>(&self, x: semantic_fixed::Num<B>, y: semantic_fixed::Num<B>) -> Result<semantic_fixed::Num<B>> 
     where 
         B: int::Int {
-        let scale: u128 = self.scale::<A, u128>();
+        let scale: u128 = scale::into::<A, u128>();
         if scale.is_power_of_two() {
             let ret: B = x << scale.trailing_zeros().try_into().unwrap();
             return Ok(ret)
@@ -292,21 +296,21 @@ pub trait MuldivEngine {
     fn muldiv<T>(&self, x: T, y: T, z: T) -> Result<T> 
     where
         T: int::Int {
-        if z == T::ZERO {
+        if z == T::N0 {
             return Err(Error::DivisionByZero);
         }
-        match (T::BITS_USIZE, T::IS_SIGNED) {
-            (_, true) if T::BITS_USIZE <= 64 => {
+        match (T::BIT, T::IS_SIGNED) {
+            (_, true) if T::BIT <= 64 => {
                 let ret: T = x.checked_mul(&y).ok_or(Error::Overflow)?;
                 let ret: T = ret / z;
                 Ok(ret)
             },
-            (_, false) if T::BITS_USIZE < 128 => {
+            (_, false) if T::BIT < 128 => {
                 let (a, b) = wide_mul::calculate(x, y)?;
                 if b >= z {
                     return Err(Error::Overflow);
                 }
-                if b == T::ZERO {
+                if b == T::N0 {
                     return Ok(a / z);
                 }
                 Ok(fold::calculate(a, b, z)? / z)
@@ -377,13 +381,13 @@ where
 
 impl<const A: u8, B, C> Q<A, B, C>
 where
-B: int::Int,
-C: Engine {
+    B: int::Int,
+    C: Engine {
     pub fn cot(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
-        let out: B = engine.cot(out)?;
-        custom(out, engine)
+        let out: B = engine.cot::<A, _>(out)?;
+        Ok(custom(out, engine))
     }
 }
 
@@ -392,28 +396,28 @@ C: Engine {
 
 impl<const A: u8, B, C> Q<A, B, C>
 where
-B: int::Int,
-C: Engine {
-pub fn tan(&self) -> Result<semantic::Ratio<Self>> {
-    let engine: C = self.engine;
-    let out: B = self.v;
-    let out: B = engine.tan(out)?;
-    custom(out, engine)
-}
+    B: int::Int,
+    C: Engine {
+    pub fn tan(&self) -> Result<semantic::Ratio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.tan::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
 
-pub fn sin(&self) -> Result<semantic::Ratio<Self>> {
-    let engine: C = self.engine;
-    let out: B = self.v;
-    let out: B = engine.sin(out)?;
-    custom(out, engine)
-}
+    pub fn sin(&self) -> Result<semantic::Ratio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.sin::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
 
-pub fn cos(&self) -> Result<semantic::Ratio<Self>> {
-    let engine: C = self.engine;
-    let out: B = self.v;
-    let out: B = engine.cos(out)?;
-    custom(out, engine)
-}
+    pub fn cos(&self) -> Result<semantic::Ratio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.cos::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
 }
 
 // --- --- ---
@@ -425,15 +429,15 @@ where
     pub fn to_radian(&self) -> Result<Self> {
         let engine: C = self.engine;
         let out: B = self.v;
-        let out: B = engine.to_radian(out)?;
-        custom(out, engine)
+        let out: B = engine.to_radian::<A, _>(out)?;
+        Ok(custom(out, engine))
     }
 
     pub fn to_degree(&self) -> Result<Self> {
         let engine: C = self.engine;
         let out: B = self.v;
-        let out: B = engine.to_degree(out)?;
-        custom(out, engine)
+        let out: B = engine.to_degree::<A, _>(out)?;
+        Ok(custom(out, engine))
     }
 }
 
@@ -532,7 +536,7 @@ where
     where
         Self: Sized {
         if self < other {
-            other
+            return other;
         }
         self
     }

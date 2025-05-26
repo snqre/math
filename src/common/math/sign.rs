@@ -4,21 +4,21 @@ use super::*;
 pub fn to_negative<T>(n: T) -> T 
 where 
     T: int::Int {
-    if n == T::ZERO {
-        return T::ZERO;
+    if n == T::N0 {
+        return T::N0;
     }
-    T::ZERO - n
+    T::N0 - n
 }
 
 #[inline]
 pub fn to_positive<T>(n: T) -> T 
 where 
     T: int::Int {
-    if n == T::ZERO {
-        return T::ZERO;
+    if n == T::N0 {
+        return T::N0;
     }
-    if n > T::ZERO {
+    if n > T::N0 {
         return n;
     }
-    T::ZERO - n
+    T::N0 - n
 }
