@@ -740,7 +740,9 @@ where
 
 // --- --- ---
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct DefaultEngine;
 
 impl Engine for DefaultEngine {}
@@ -1213,8 +1215,7 @@ where
 impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
 where
     B: int::Int,
-    C: Engine,
-    (): Ok<A, B> {
+    C: Engine {
     type Output = Result<Self>;
 
     #[inline]
@@ -1232,8 +1233,7 @@ where
 impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
 where
     B: int::Int,
-    C: Engine,
-    (): Ok<A, B> {
+    C: Engine {
     type Output = Result<Self>;
 
     #[inline]
@@ -1400,6 +1400,8 @@ where
 // --- --- ---
 
 #[allow(clippy::zero_prefixed_literal)]
+#[allow(clippy::mistyped_literal_suffixes)]
+#[allow(clippy::inconsistent_digit_grouping)]
 #[cfg(test)]
 mod test {
     use super::*;
@@ -1407,7 +1409,24 @@ mod test {
     // --- --- ---
 
     #[::rstest::rstest]
-    #[case(0_78, 0_71)]
+    #[case(0_78, 1_32_u128)]
+    fn cosh<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let angle: Q2<T> = angle.cosh().unwrap();
+        let ok: Q2<T> = ok.into();
+        assert_eq!(angle, ok);
+    }
+
+    // --- --- ---
+
+    #[::rstest::rstest]
+    #[case(0_78, 1_42)]
+    #[case(1_00, 1_19)]
+    #[case(6_25, -33_33)]
     fn csc<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
@@ -1420,12 +1439,13 @@ mod test {
     }
 
     #[::rstest::rstest]
-    #[case(0_78, 0_71)]
+    #[case(0_78, 1_40)]
+    #[case(0_00, 1_00)]
+    #[case(1_00, 1_85)]
     fn sec<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
-        T: int::Int,
-        (): Ok<2, T> {
+        T: int::Int {
         let angle: Q2<T> = angle.into();
         let angle: Q2<T> = angle.sec().unwrap();
         let ok: Q2<T> = ok.into();
@@ -1433,7 +1453,9 @@ mod test {
     }
 
     #[::rstest::rstest]
-    #[case(0_78, 0_71)]
+    #[case(0_78, 1_02)]
+    #[case(1_00, 0_64)]
+    #[case(0_45, 2_08)]
     fn cot<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
@@ -1448,7 +1470,7 @@ mod test {
     // --- --- ---
 
     #[::rstest::rstest]
-    #[case(0_78, 0_71)]
+    #[case(0_78, 0_98)]
     fn tan<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
@@ -1460,7 +1482,9 @@ mod test {
     }
 
     #[::rstest::rstest]
-    #[case(0_78, 0_71)]
+    #[case(0_78, 0_70)]
+    #[case(0_00, 0_00)]
+    #[case(1_00, 0_84)]
     fn sin<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
@@ -1473,6 +1497,12 @@ mod test {
 
     #[::rstest::rstest]
     #[case(0_78, 0_71)]
+    #[case(0_00, 1_00)]
+    #[case(1_00, 0_54)]
+    #[case(1_57, 0_00)]
+    #[case(3_14, -0_99)]
+    #[case(4_71, 0_00)]
+    #[case(6_28, 1_00)]
     fn cos<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
     where
         T: ::core::fmt::Debug,
@@ -1487,6 +1517,15 @@ mod test {
 
     #[::rstest::rstest]
     #[case(45_00, 0_78)]
+    #[case(360_00, 6_28)]
+    #[case(90_00, 1_57)]
+    #[case(180_00, 3_14)]
+    #[case(0_00, 0_00)]
+    #[case(-90_00, -1_57)]
+    #[case(-180_00, -3_14)]
+    #[case(-360_00, -6_28)]
+    #[case(720_00, 12_56)]
+    #[case(1_00, 0_01)]
     fn to_radian<T>(#[case] angle: semantic_fixed::Degree<T>, #[case] ok: semantic_fixed::Radian<T>)
     where
         T: ::core::fmt::Debug,
@@ -1499,6 +1538,15 @@ mod test {
 
     #[::rstest::rstest]
     #[case(0_78, 44_71)]
+    #[case(6_28, 360_00)]
+    #[case(1_57, 90_00)]
+    #[case(3_14, 180_00)]
+    #[case(0_00, 0_00)]
+    #[case(-1_57, -90_00)]
+    #[case(-3_14, -180_00)]
+    #[case(7_85, 450_00)]
+    #[case(12_57, 720_57)]
+    #[case(-6_28, -360_00)]
     fn to_degree<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: semantic_fixed::Degree<T>)
     where
         T: ::core::fmt::Debug,
@@ -1513,6 +1561,17 @@ mod test {
 
     #[::rstest::rstest]
     #[case(1_00, 1_00, 2_00)]
+    #[case(0_50, 5_00, 5_50)]
+    #[case(0_00, 7_00, 7_00)]
+    #[case(5_00, 0_50, 5_50)]
+    #[case(0_00, 0_00, 0_00)]
+    #[case(-1_00, 1_00, 0_00)]
+    #[case(1_00, -1_00, 0_00)]
+    #[case(-2_00, -3_00, -5_00)]
+    #[case(-1_50, 0_50, -1_00)]
+    #[case(0_50, -1_50, -1_00)]
+    #[case(i32::MAX - 1_00, 1_00, i32::MAX)]
+    #[case(i32::MIN + 1_00, -1_00, i32::MIN)]
     fn add<T>(#[case] x: T, #[case] y: T, #[case] ok: T) 
     where
         T: ::core::fmt::Debug,
@@ -1526,6 +1585,15 @@ mod test {
 
     #[::rstest::rstest]
     #[case(1_00, 1_00, 0_00)]
+    #[case(0_50, 0_50, 0_00)]
+    #[case(7_50, 1_50, 6_00)]
+    #[case(0_00, 0_00, 0_00)]
+    #[case(1_00, 0_00, 1_00)]
+    #[case(0_00, 1_00, -1_00)]
+    #[case(1_00, -1_00, 2_00)]
+    #[case(-1_00, 1_00, -2_00)]
+    #[case(-1_00, -1_00, 0_00)]
+    #[case(-2_00, -3_00, 1_00)]
     fn sub<T>(#[case] x: T, #[case] y: T, #[case] ok: T) 
     where
         T: ::core::fmt::Debug,
@@ -1538,6 +1606,19 @@ mod test {
     }
     
     #[::rstest::rstest]
+    #[case(1_00, 1_00, 1_00)]
+    #[case(0_50, 0_50, 0_25)]
+    #[case(50_00, 0_80, 40_00)]
+    #[case(-0_30, 0_80, -0_24)]
+    #[case(0_00, 0_00, 0_00)]
+    #[case(1_00, 0_00, 0_00)]
+    #[case(0_00, 1_00, 0_00)]
+    #[case(-1_00, -1_00, 1_00)]
+    #[case(1_00, -1_00, -1_00)]
+    #[case(i32::MAX, 0_01, i32::MAX / 1_00)]
+    #[case(i32::MIN, 0_01, i32::MIN / 1_00)]
+    #[case(0_01, 0_01, 0_00)]
+    #[case(-0_01, -0_01, 0_00)]
     #[case(1_00, 1_00, 1_00)]
     fn mul<T>(#[case] x: T, #[case] y: T, #[case] ok: T) 
     where
@@ -1553,6 +1634,18 @@ mod test {
     #[::rstest::rstest]
     #[case(1_00, 1_00, 1_00)]
     #[case(7_25, 0_50, 14_50)]
+    #[case(0_00, 1_00, 0_00)]
+    #[case(1_00, -1_00, -1_00)]
+    #[case(-1_00, 1_00, -1_00)]
+    #[case(-1_00, -1_00, 1_00)]
+    #[case(1_00, 3_00, 0_33)]
+    #[case(2_00, 3_00, 0_66)]
+    #[case(1_00, 8_00, 0_12)]
+    #[case(1_00, 4_00, 0_25)]
+    #[case(1_00, 2_00, 0_50)]
+    #[case(1_00, 0_01, 100_00)]
+    #[case(1_00, 0_02, 50_00)]
+    #[case(0_01, 1_00, 0_01)]
     fn div<T>(#[case] x: T, #[case] y: T, #[case] ok: T)
     where
         T: ::core::fmt::Debug,

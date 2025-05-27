@@ -15,5 +15,5 @@ pub enum Error {
 }
 
 fn t() {
-    let x: q::Q2<u128> = q::custom(500, q::DefaultEngine);
+    let count: q::Q6<u128> = 500_000000.into();
 }
