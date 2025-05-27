@@ -1031,6 +1031,8 @@ pub type Q36<T> = Default<36, T>;
 pub type Q37<T> = Default<37, T>;
 pub type Q38<T> = Default<38, T>;
 
+// --- --- ---
+
 pub type Default<const A: u8, B> = Q<A, B, DefaultEngine>;
 
 // --- --- ---
@@ -1086,10 +1088,52 @@ where
 
 // --- --- ---
 
+impl<const A: u8, B> From<B> for Default<A, B>
+where
+    B: int::Int {
+    fn from(value: B) -> Self {
+        Self::new(value)
+    }
+}
+
+// --- --- ---
+
 impl<const A: u8, B, C> Q<A, B, C>
 where
     B: int::Int,
     C: Engine {
+    #[inline]
+    pub fn tanh(&self) -> Result<semantic::HyperbolicRatio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.tanh::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
+
+    #[inline]
+    pub fn sinh(&self) -> Result<semantic::HyperbolicRatio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.sinh::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
+
+    #[inline]
+    pub fn cosh(&self) -> Result<semantic::HyperbolicRatio<Self>> {
+        let engine: C = self.engine;
+        let out: B = self.v;
+        let out: B = engine.cosh::<A, _>(out)?;
+        Ok(custom(out, engine))
+    }
+}
+
+// --- --- ---
+
+impl<const A: u8, B, C> Q<A, B, C>
+where
+    B: int::Int,
+    C: Engine {
+    #[inline]
     pub fn csc(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1097,6 +1141,7 @@ where
         Ok(custom(out, engine))
     }
 
+    #[inline]
     pub fn sec(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1104,6 +1149,7 @@ where
         Ok(custom(out, engine))
     }
 
+    #[inline]
     pub fn cot(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1119,6 +1165,7 @@ where
     B: int::Int,
     C: Engine,
     (): Ok<A, B> {
+    #[inline]
     pub fn tan(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1126,6 +1173,7 @@ where
         Ok(custom(out, engine))
     }
 
+    #[inline]
     pub fn sin(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1133,6 +1181,7 @@ where
         Ok(custom(out, engine))
     }
 
+    #[inline]
     pub fn cos(&self) -> Result<semantic::Ratio<Self>> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1148,6 +1197,7 @@ where
     B: int::Int,
     C: Engine,
     (): Ok<A, B> {
+    #[inline]
     pub fn to_radian(&self) -> Result<Self> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1155,6 +1205,7 @@ where
         Ok(custom(out, engine))
     }
 
+    #[inline]
     pub fn to_degree(&self) -> Result<Self> {
         let engine: C = self.engine;
         let out: B = self.v;
@@ -1169,9 +1220,10 @@ impl<const A: u8, B, C> ::core::ops::Add for Q<A, B, C>
 where
     B: int::Int,
     C: Engine,
-    (): precision::Ok<A, B> {
+    (): Ok<A, B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         let engine: C = self.engine;
         let x: B = self.v;
@@ -1187,9 +1239,10 @@ impl<const A: u8, B, C> ::core::ops::Sub for Q<A, B, C>
 where
     B: int::Int,
     C: Engine,
-    (): precision::Ok<A, B> {
+    (): Ok<A, B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         let engine: C = self.engine;
         let x: B = self.v;
@@ -1208,6 +1261,7 @@ where
     (): Ok<A, B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         let engine: C = self.engine;
         let x: B = self.v;
@@ -1226,6 +1280,7 @@ where
     (): Ok<A, B> {
     type Output = Result<Self>;
 
+    #[inline]
     fn div(self, rhs: Self) -> Self::Output {
         let engine: C = self.engine;
         let x: B = self.v;
@@ -1241,6 +1296,7 @@ impl<const A: u8, B, C> Ord for Q<A, B, C>
 where
     B: int::Int,
     C: Engine {
+    #[inline]
     fn clamp(self, min: Self, max: Self) -> Self
     where
         Self: Sized {
@@ -1253,6 +1309,7 @@ where
         self
     }
 
+    #[inline]
     fn max(self, other: Self) -> Self
     where
         Self: Sized {
@@ -1262,6 +1319,7 @@ where
         self
     }
 
+    #[inline]
     fn min(self, other: Self) -> Self
     where
         Self: Sized {
@@ -1271,6 +1329,7 @@ where
         self
     }
 
+    #[inline]
     fn cmp(&self, other: &Self) -> ::core::cmp::Ordering {
         if self < other {
             return ::core::cmp::Ordering::Less;
@@ -1288,30 +1347,35 @@ impl<const A: u8, B, C> PartialOrd for Q<A, B, C>
 where
     B: int::Int,
     C: Engine {
+    #[inline]
     fn ge(&self, other: &Self) -> bool {
         let x: B = self.v;
         let y: B = other.v;
         x >= y
     }
 
+    #[inline]
     fn gt(&self, other: &Self) -> bool {
         let x: B = self.v;
         let y: B = other.v;
         x > y
     }
 
+    #[inline]
     fn le(&self, other: &Self) -> bool {
         let x: B = self.v;
         let y: B = other.v;
         x <= y
     }
 
+    #[inline]
     fn lt(&self, other: &Self) -> bool {
         let x: B = self.v;
         let y: B = other.v;
         x < y
     }
 
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         Some(self.cmp(other))
     }
@@ -1331,6 +1395,7 @@ impl<const A: u8, B, C> PartialEq for Q<A, B, C>
 where
     B: int::Int,
     C: Engine {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         let x: B = self.v;
         let y: B = other.v;
@@ -1348,12 +1413,117 @@ mod test {
     // --- --- ---
 
     #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn csc<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let angle: Q2<T> = angle.csc().unwrap();
+        let ok: Q2<T> = ok.into();
+        assert_eq!(angle, ok);
+    }
+
+    #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn sec<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let angle: Q2<T> = angle.sec().unwrap();
+        let ok: Q2<T> = ok.into();
+        assert_eq!(angle, ok);
+    }
+
+    #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn cot<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let angle: Q2<T> = angle.cot().unwrap();
+        let ok: Q2<T> = ok.into();
+        assert_eq!(angle, ok);
+    }
+
+    // --- --- ---
+
+    #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn tan<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let result = angle.tan().unwrap();
+        assert_eq!(result, new(ok))
+    }
+
+    #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn sin<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let result = angle.sin().unwrap();
+        assert_eq!(result, new(ok))
+    }
+
+    #[::rstest::rstest]
+    #[case(0_78, 0_71)]
+    fn cos<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: T)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let result = angle.cos().unwrap();
+        assert_eq!(result, new(ok))
+    }
+
+    // --- --- ---
+
+    #[::rstest::rstest]
+    #[case(45_00, 0_78)]
+    fn to_radian<T>(#[case] angle: semantic_fixed::Degree<T>, #[case] ok: semantic_fixed::Radian<T>)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let result = angle.to_radian().unwrap();
+        assert_eq!(result, new(ok));
+    }
+
+    #[::rstest::rstest]
+    #[case(0_78, 44_71)]
+    fn to_degree<T>(#[case] angle: semantic_fixed::Radian<T>, #[case] ok: semantic_fixed::Degree<T>)
+    where
+        T: ::core::fmt::Debug,
+        T: int::Int,
+        (): Ok<2, T> {
+        let angle: Q2<T> = angle.into();
+        let result = angle.to_degree().unwrap();
+        assert_eq!(result, new(ok));
+    }
+
+    // --- --- ---
+
+    #[::rstest::rstest]
     #[case(1_00, 1_00, 2_00)]
     fn add<T>(#[case] x: T, #[case] y: T, #[case] ok: T) 
     where
         T: ::core::fmt::Debug,
         T: int::Int,
-        (): precision::Ok<2, T> {
+        (): Ok<2, T> {
         let x: Q2<T> = x.into();
         let y: Q2<T> = y.into();
         let result: Q2<T> = (x + y).unwrap();
@@ -1366,7 +1536,7 @@ mod test {
     where
         T: ::core::fmt::Debug,
         T: int::Int,
-        (): precision::Ok<2, T> {
+        (): Ok<2, T> {
         let x: Q2<T> = x.into();
         let y: Q2<T> = y.into();
         let result: Q2<T> = (x - y).unwrap();

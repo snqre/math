@@ -1,4 +1,4 @@
-pub const fn get(n: u8) -> (u16, u16) {
+pub const fn coef(n: u8) -> (u16, u16) {
     match n {
         0 => (1, 1),
         1 => (1, 6),
