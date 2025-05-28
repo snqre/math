@@ -18,9 +18,10 @@ pub enum Error {
 
 // --- --- ---
 
-pub trait Point<const A: u8, B, C>
+pub trait Point<const A: usize, const B: u8, C, D>
 where
-    B: int::Int,
-    C: q::Engine {
-    fn distance_between(&self, other: Self) -> Result<q::Q<A, B, C>>;
+    C: int::Int,
+    D: q::Engine {
+    fn dimension() -> [q::Q<B, C, D>; A];
+    fn distance_between(&self, other: Self) -> Result<q::Q<B, C, D>>;
 }

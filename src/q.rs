@@ -25,13 +25,11 @@ where
     fn tanh<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::HyperbolicRatio<B>> 
     where
         B: int::Int {
-        let s: B = self.sinh::<A, _>(angle)?;
-        let c: B = self.cosh::<A, _>(angle)?;
-        self.div::<A, B>(s, c)
+        Ok(Self::div::<A, B>(Self::sinh::<A, _>(angle)?, Self::cosh::<A, _>(angle)?)?)
     }
     
     #[inline]
-    fn sinh<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::HyperbolicRatio<B>> 
+    fn sinh<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::HyperbolicRatio<B>> 
     where 
         B: int::Int {
         let mut term: B;
@@ -43,8 +41,8 @@ where
         let scale: B = scale::<A, _>();
         while k <= k17 {
             let f = (B::N2 * k) * (B::N2 * k + B::N1);
-            pow = self.muldiv(pow, angle, scale)?;
-            pow = self.muldiv(pow, angle, scale)?;
+            pow = Self::muldiv(pow, angle, scale)?;
+            pow = Self::muldiv(pow, angle, scale)?;
             fact = fact.checked_mul(&f).ok_or(Error::Overflow)?;
             term = pow.checked_div(&fact).ok_or(Error::DivisionByZero)?;
             sum = sum.checked_add(&term).ok_or(Error::Overflow)?;
@@ -54,7 +52,7 @@ where
     }
     
     #[inline]
-    fn cosh<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::HyperbolicRatio<B>> 
+    fn cosh<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::HyperbolicRatio<B>> 
     where 
         B: int::Int {
         let mut sum = B::N1;
@@ -101,28 +99,24 @@ pub trait TrigReciprocalEngine
 where
     Self: TrigEngine {
     #[inline]
-    fn csc<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
+    fn csc<const A: u8, B>(angle: &semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        let out: B = self.sin::<A, _>(angle)?;
-        let out: B = self.div::<A, _>(scale::<A, _>(), out)?;
-        Ok(out)
+        Ok(Self::div::<A, _>(scale::<A, _>(), Self::sin::<A, _>(angle)?)?)
     }
     
     #[inline]
-    fn sec<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
+    fn sec<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        let out: B = self.cos::<A, _>(angle)?;
-        self.div::<A, _>(scale::<A, _>(), out)
+        Ok(Self::div::<A, _>(scale::<A, _>(), Self::cos::<A, _>(angle)?)?)
     }
     
     #[inline]
-    fn cot<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
+    fn cot<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        let out: B = self.tan::<A, _>(angle)?;
-        self.div::<A, _>(scale::<A, _>(), out)
+        Ok(Self::div::<A, _>(scale::<A, _>(), Self::tan::<A, _>(angle)?)?)
     }
 }
 
@@ -138,16 +132,14 @@ where
     Self: BaseEngine,
     Self: TrigConversionEngine {
     #[inline]
-    fn tan<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
+    fn tan<const A: u8, B>(angle: &semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
-        let s: B = self.sin::<A, _>(angle)?;
-        let c: B = self.cos::<A, _>(angle)?;
-        self.div::<A, _>(s, c)
+        Ok(Self::div::<A, _>(Self::sin::<A, _>(angle)?, Self::cos::<A, _>(angle)?)?)
     }
     
     #[inline]
-    fn sin<const A: u8, B>(&self, angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
+    fn sin<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Ratio<B>> 
     where 
         B: int::Int {
         let rad90: B = self.to_radian::<A, _>(deg90::<A, _>()?)?;
@@ -225,7 +217,7 @@ pub trait TrigConversionEngine
 where
     Self: MuldivEngine {
     #[inline]
-    fn to_radian<const A: u8, B>(angle: semantic_fixed::Degree<B>) -> Result<semantic_fixed::Radian<B>> 
+    fn to_radian<const A: u8, B>(angle: &semantic_fixed::Degree<B>) -> Result<semantic_fixed::Radian<B>> 
     where 
         B: int::Int {
         let n: u8 = 180;
@@ -238,7 +230,7 @@ where
     }
     
     #[inline]
-    fn to_degree<const A: u8, B>(angle: semantic_fixed::Radian<B>) -> Result<semantic_fixed::Degree<B>> 
+    fn to_degree<const A: u8, B>(angle: &semantic_fixed::Radian<B>) -> Result<semantic_fixed::Degree<B>> 
     where 
         B: int::Int {
         let n: u8 = 180;
@@ -563,8 +555,8 @@ pub trait MuldivEngine {
                 Ok(fold(a, b, z)? / z)
             },
             (128, _) => {
-                let ret: T = x.checked_mul(&y).ok_or(Error::Overflow)?;
-                Ok(ret / z)
+                let n: T = x.checked_mul(&y).ok_or(Error::Overflow)?;
+                Ok(n / z)
             },
             _ => unsafe {
                 ::core::hint::unreachable_unchecked();
@@ -593,17 +585,17 @@ where
         let z: i128 = z.to_i128().unwrap_unchecked();
         (x, y, z)
     };
-    let ret: i128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
-    if ret > T::MAX_I128 {
+    let n: i128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
+    if n > T::MAX_I128 {
         return Err(Error::Overflow);
     }
-    if ret < T::MIN_I128 {
+    if n < T::MIN_I128 {
         return Err(Error::Underflow);
     }
-    let ret: T = unsafe {
-        T::from(ret).unwrap_unchecked()
+    let n: T = unsafe {
+        T::from(n).unwrap_unchecked()
     };
-    Ok(ret)
+    Ok(n)
 }
 
 #[inline]
@@ -616,17 +608,17 @@ where
         let z: u128 = z.to_u128().unwrap_unchecked();
         (x, y, z)
     };
-    let r: u128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
-    if r > T::MAX_U128 {
+    let n: u128 = (((((y % z) << 64) | (x >> 64)) % z) << 64) | (x & 0xFFFFFFFFFFFFFFFF);
+    if n > T::MAX_U128 {
         return Err(Error::Overflow)
     }
-    if r < T::MIN_U128 {
+    if n < T::MIN_U128 {
         return Err(Error::Underflow)
     }
-    let r: T = unsafe {
-        T::from(r).unwrap_unchecked()
+    let n: T = unsafe {
+        T::from(n).unwrap_unchecked()
     };
-    Ok(r)
+    Ok(n)
 }
 
 #[inline]
@@ -640,7 +632,7 @@ where
 }
 
 #[inline]
-fn signed_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
+fn signed_wide_mul<T>(x: &T, y: &T) -> Result<(T, T)> 
 where 
     T: int::Int {
     assert!(T::IS_SIGNED);
@@ -678,7 +670,7 @@ where
 }
 
 #[inline]
-fn unsigned_wide_mul<T>(x: T, y: T) -> Result<(T, T)> 
+fn unsigned_wide_mul<T>(x: &T, y: &T) -> Result<(T, T)> 
 where 
     T: int::Int, {
     assert!(!T::IS_SIGNED);
@@ -741,26 +733,26 @@ where
 
 pub trait SignEngine {
     #[inline]
-    fn to_negative<T>(n: T) -> T 
+    fn to_negative<T>(n: &T) -> T 
     where 
         T: int::Int {
-        if n == T::N0 {
+        if n == &T::N0 {
             return T::N0;
         }
-        T::N0 - n
+        T::N0 - *n
     }
     
     #[inline]
-    fn to_positive<T>(n: T) -> T 
+    fn to_positive<T>(n: &T) -> T 
     where 
         T: int::Int {
-        if n == T::N0 {
+        if n == &T::N0 {
             return T::N0;
         }
-        if n > T::N0 {
-            return n;
+        if n > &T::N0 {
+            return *n;
         }
-        T::N0 - n
+        T::N0 - *n
     }
 }
 
